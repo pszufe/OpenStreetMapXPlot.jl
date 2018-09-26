@@ -26,7 +26,11 @@ map_data = OpenStreetMapX.get_map_data("/home/ubuntu/", "mymap.osm");
 p = OpenStreetMapXPlot.plotmap(map_data.nodes, OpenStreetMapX.ENU(map_data.bounds), roadways=map_data.roadways,roadwayStyle = OpenStreetMapXPlot.LAYER_STANDARD, width=600, height=600)
 ```
 
-See the `samples` directory for a more complete example.  
+![](plot_image.png)
+
+
+
+See the `samples` directory for a more complete example with routing and drawing routes.  
 
 
 
