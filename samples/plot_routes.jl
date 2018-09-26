@@ -34,14 +34,14 @@ end
 
 
 function plotmap(mapD::OpenStreetMapX.MapData; width::Int=600, height::Int=600)::Plots.Plot
-    p = OpenStreetMapX.plotmap(mapD.nodes, OpenStreetMapX.ENU(mapD.bounds), roadways=mapD.roadways,roadwayStyle = OpenStreetMapX.LAYER_STANDARD, width=width, height=height)
+    p = OpenStreetMapXPlot.plotmap(mapD.nodes, OpenStreetMapX.ENU(mapD.bounds), roadways=mapD.roadways,roadwayStyle = OpenStreetMapXPlot.LAYER_STANDARD, width=width, height=height)
     return p
 end
 
 function plotroutes!(p::Plots.Plot,mapD::OpenStreetMapX.MapData,routes::Vector{RouteData})
     for route in routes
-        OpenStreetMapX.addroute!(p,mapD.nodes,route.fastest_route, route_color = "0x000000")
-        OpenStreetMapX.addroute!(p,mapD.nodes,route.shortest_route,  route_color = "0xFF0000")
+        OpenStreetMapXPlot.addroute!(p,mapD.nodes,route.fastest_route, route_color = "0x000000")
+        OpenStreetMapXPlot.addroute!(p,mapD.nodes,route.shortest_route,  route_color = "0xFF0000")
     end
 end
 

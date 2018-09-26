@@ -74,10 +74,10 @@ end
 
 function draw_buildings!(p::Plots.Plot,nodes::Dict{Int,T}, buildings::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
     if isa(style, OpenStreetMapXPlot.Style)
-        OpenStreetMapX.draw_ways!(p,nodes,buildings,style,km)
+        OpenStreetMapXPlot.draw_ways!(p,nodes,buildings,style,km)
     else
         classes = OpenStreetMapX.classify_buildings(buildings)
-        OpenStreetMapX.draw_ways!(p,nodes,buildings, classes, style,km)
+        OpenStreetMapXPlot.draw_ways!(p,nodes,buildings, classes, style,km)
     end
 end
 
@@ -87,10 +87,10 @@ end
 
 function draw_roadways!(p::Plots.Plot,nodes::Dict{Int,T}, roadways::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
     if isa(style, OpenStreetMapXPlot.Style)
-        OpenStreetMapX.draw_ways!(p,nodes,roadways,style,km)
+        OpenStreetMapXPlot.draw_ways!(p,nodes,roadways,style,km)
     else
         classes = OpenStreetMapX.classify_roadways(roadways)
-        OpenStreetMapX.draw_ways!(p,nodes,roadways, classes, style,km)
+        OpenStreetMapXPlot.draw_ways!(p,nodes,roadways, classes, style,km)
     end
 end
 
@@ -100,10 +100,10 @@ end
 
 function draw_walkways!(p::Plots.Plot,nodes::Dict{Int,T}, walkways::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
     if isa(style, OpenStreetMapXPlot.Style)
-        OpenStreetMapX.draw_ways!(p,nodes,walkways,style,km)
+        OpenStreetMapXPlot.draw_ways!(p,nodes,walkways,style,km)
     else
         classes = OpenStreetMapX.classify_walkways(walkways)
-        OpenStreetMapX.draw_ways!(p,nodes,walkways, classes, style,km)
+        OpenStreetMapXPlot.draw_ways!(p,nodes,walkways, classes, style,km)
     end
 end
 
@@ -113,10 +113,10 @@ end
 
 function draw_cycleways!(p::Plots.Plot,nodes::Dict{Int,T}, cycleways::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
     if isa(style, OpenStreetMapXPlot.Style)
-        OpenStreetMapX.draw_ways!(p,nodes,cycleways,style,km)
+        OpenStreetMapXPlot.draw_ways!(p,nodes,cycleways,style,km)
     else
         classes = OpenStreetMapX.classify_cycleways(cycleways)
-        OpenStreetMapX.draw_ways!(p,nodes,cycleways, classes, style,km)
+        OpenStreetMapXPlot.draw_ways!(p,nodes,cycleways, classes, style,km)
     end
 end
 
@@ -199,23 +199,23 @@ function plotmap(nodes::Dict{Int,T},
     end
     # Draw all buildings
     if !isa(buildings,Nothing)
-        OpenStreetMapX.draw_buildings!(p,nodes, buildings, buildingStyle, km)
+        OpenStreetMapXPlot.draw_buildings!(p,nodes, buildings, buildingStyle, km)
     end
     # Draw all roadways
     if !isa(roadways,Nothing)
-        OpenStreetMapX.draw_roadways!(p,nodes, roadways, roadwayStyle, km)
+        OpenStreetMapXPlot.draw_roadways!(p,nodes, roadways, roadwayStyle, km)
     end
     # Draw all walkways
     if !isa(walkways,Nothing)
-        OpenStreetMapX.draw_walkways!(p,nodes, walkways, walkwayStyle, km)
+        OpenStreetMapXPlot.draw_walkways!(p,nodes, walkways, walkwayStyle, km)
     end
     # Draw all cycleways
     if !isa(cycleways,Nothing)
-        OpenStreetMapX.draw_cycleways!(p,nodes, cycleways, cyclewayStyle, km)
+        OpenStreetMapXPlot.draw_cycleways!(p,nodes, cycleways, cyclewayStyle, km)
     end
     #Draw all features
     if !isa(features,Nothing)
-        OpenStreetMapX.draw_features!(p,nodes, features, featureStyle, km)
+        OpenStreetMapXPlot.draw_features!(p,nodes, features, featureStyle, km)
     end
     if fontsize > 0
         attr = Dict(:fontsize => fontsize)

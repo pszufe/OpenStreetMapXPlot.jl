@@ -15,7 +15,7 @@ Pkg.add(PackageSpec(url="https://github.com/pszufe/OpenStreetMapX.jl"))
 Pkg.add(PackageSpec(url="https://github.com/pszufe/OpenStreetMapXPlot.jl"))
 ```
 
-
+Note that currently `Plots.jl` cannot be precompiled and hence the second command will show several warnings. 
 
 ## Usage
 
@@ -23,7 +23,7 @@ Pkg.add(PackageSpec(url="https://github.com/pszufe/OpenStreetMapXPlot.jl"))
 using OpenStreetMapX, OpenStreetMapXPlot
 map_data = OpenStreetMapX.get_map_data("/home/ubuntu/", "mymap.osm");
 
-p = OpenStreetMapX.plotmap(map_data.nodes, OpenStreetMapX.ENU(map_data.bounds), roadways=map_data.roadways,roadwayStyle = OpenStreetMapX.LAYER_STANDARD, width=600, height=600)
+p = OpenStreetMapXPlot.plotmap(map_data.nodes, OpenStreetMapX.ENU(map_data.bounds), roadways=map_data.roadways,roadwayStyle = OpenStreetMapXPlot.LAYER_STANDARD, width=600, height=600)
 ```
 
 See the `samples` directory for a more complete example.  
