@@ -1,12 +1,7 @@
-# OpenStreetMapX.jl
-This is a complete re-write of OpenStreetMap.jl package.  
+# OpenStreetMapXPlot.jl
+This is a complete re-write of OpenStreetMap.jl package - plotting module.  
 
-Compared to the original package major changes include:
-
-- `Plots.jl` with GR is used as backend for map vizualization 
-- `LightGraphs.jl` is used for map data storage
-- Several changes with routing algorithm (currently finding a route in a 1 million people city takes around 250ms)
-- Data structure adjusment to make the library more suitable to run simulations of cities. 
+Compared to the original package this module uses `Plots.jl` with GR is used as backend for map vizualization. 
 
 
 
@@ -15,7 +10,9 @@ Compared to the original package major changes include:
 The current version uses Julia 1.0.0
 
 ```julia
-using Pkg; Pkg.add(PackageSpec(url="https://github.com/pszufe/OpenStreetMapX.jl"))
+using Pkg
+Pkg.add(PackageSpec(url="https://github.com/pszufe/OpenStreetMapX.jl"))
+Pkg.add(PackageSpec(url="https://github.com/pszufe/OpenStreetMapXPlot.jl"))
 ```
 
 
@@ -23,7 +20,7 @@ using Pkg; Pkg.add(PackageSpec(url="https://github.com/pszufe/OpenStreetMapX.jl"
 ## Usage
 
 ```julia
-using OpenStreetMapX
+using OpenStreetMapX, OpenStreetMapXPlot
 map_data = OpenStreetMapX.get_map_data("/home/ubuntu/", "mymap.osm");
 
 p = OpenStreetMapX.plotmap(map_data.nodes, OpenStreetMapX.ENU(map_data.bounds), roadways=map_data.roadways,roadwayStyle = OpenStreetMapX.LAYER_STANDARD, width=600, height=600)
