@@ -4,7 +4,6 @@ mapfile = "map2.osm";
 datapath = "/home/ubuntu/";
 map_data = OpenStreetMapX.get_map_data(datapath, mapfile);
 
-
 mutable struct RouteData
     shortest_route
     fastest_route
@@ -32,10 +31,11 @@ function find_routes(pointA::Tuple{Float64,Float64},pointB::Tuple{Float64,Float6
     return RouteData(shortest_route, fastest_route)
 end
 
-
 function plotmap(mapD::OpenStreetMapX.MapData; width::Int=600, height::Int=600)::Plots.Plot
-    p = OpenStreetMapXPlot.plotmap(mapD.nodes, OpenStreetMapX.ENU(mapD.bounds), roadways=mapD.roadways,roadwayStyle = OpenStreetMapXPlot.LAYER_STANDARD, width=width, height=height)
-    return p
+    OpenStreetMapXPlot.plotmap(mapD.nodes, OpenStreetMapX.ENU(mapD.bounds),
+                               roadways=mapD.roadways,
+                               roadwayStyle=OpenStreetMapXPlot.LAYER_STANDARD,
+                               width=width, height=height)
 end
 
 function plotroutes!(p::Plots.Plot,mapD::OpenStreetMapX.MapData,routes::Vector{RouteData})
@@ -45,7 +45,6 @@ function plotroutes!(p::Plots.Plot,mapD::OpenStreetMapX.MapData,routes::Vector{R
     end
 end
 
-
 routes = RouteData[]
 for i in 1:3
     origin = generate_point_in_bounds(map_data);
@@ -54,7 +53,5 @@ for i in 1:3
 end
 
 p = plotmap(map_data);
-
 plotroutes!(p,map_data,routes);
-
 display(p)
