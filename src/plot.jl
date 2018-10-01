@@ -17,7 +17,9 @@ Style(x, y) = Style(x, y, "-")
 const Styles = Union{OpenStreetMapXPlot.Style,Dict{Int,OpenStreetMapXPlot.Style}}
 gr();
 
-const gr_linestyles = Dict("-" => :solid, ":"=>:dot, ";"=>:dashdot, "-."=>:dashdot,"--"=>:dash)                                                                                               ####################
+const gr_linestyles = Dict("-" => :solid, ":"=>:dot, ";"=>:dashdot, "-."=>:dashdot,"--"=>:dash)
+
+####################
 ### Aspect Ratio ###
 ####################
 
@@ -31,7 +33,8 @@ function aspect_ratio(bounds::OpenStreetMapX.Bounds{OpenStreetMapX.LLA})
 end
 
 ### Compute exact "aspect ratio" ###
-aspect_ratio(bounds::OpenStreetMapX.Bounds{OpenStreetMapX.ENU}) = (bounds.max_x - bounds.min_x) / (bounds.max_y - bounds.min_y)
+aspect_ratio(bounds::OpenStreetMapX.Bounds{OpenStreetMapX.ENU}) =
+    (bounds.max_x - bounds.min_x) / (bounds.max_y - bounds.min_y)
 
 #################
 ### Draw Ways ###
@@ -39,7 +42,9 @@ aspect_ratio(bounds::OpenStreetMapX.Bounds{OpenStreetMapX.ENU}) = (bounds.max_x 
 
 ### Without defined layers ###
 
-function draw_ways!(p::Plots.Plot,nodes::Dict{Int,T}, ways::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
+function draw_ways!(p::Plots.Plot,nodes::Dict{Int,T}, ways::Vector{OpenStreetMapX.Way},
+                    style::OpenStreetMapXPlot.Styles,
+                    km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
     for way in ways
         X = [OpenStreetMapX.getX(nodes[node]) for node in way.nodes]
         Y = [OpenStreetMapX.getY(nodes[node]) for node in way.nodes]
@@ -47,14 +52,16 @@ function draw_ways!(p::Plots.Plot,nodes::Dict{Int,T}, ways::Vector{OpenStreetMap
             X /= 1000
             Y /= 1000
         end
-        #length(X) > 1 && Plots.plot(p, X, Y, style.spec, color=style.color, linewidth=style.width)
-		length(X) > 1 && Plots.plot!(p, X, Y, color=style.color,width=style.width,linestyle=gr_linestyles[style.spec])
+        length(X) > 1 && Plots.plot!(p, X, Y, color=style.color,width=style.width,
+                                     linestyle=gr_linestyles[style.spec])
     end
 end
 
 ### With defined Layers ###
 
-function draw_ways!(p::Plots.Plot,nodes::Dict{Int,T}, ways::Vector{OpenStreetMapX.Way},class::Dict{Int,Int}, style::OpenStreetMapXPlot.Styles,km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
+function draw_ways!(p::Plots.Plot,nodes::Dict{Int,T}, ways::Vector{OpenStreetMapX.Way},
+                    class::Dict{Int,Int}, style::OpenStreetMapXPlot.Styles,
+                    km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
     for i = 1:length(ways)
         lineStyle = style[class[ways[i].id]]
         X = [OpenStreetMapX.getX(nodes[node]) for node in ways[i].nodes]
@@ -63,8 +70,8 @@ function draw_ways!(p::Plots.Plot,nodes::Dict{Int,T}, ways::Vector{OpenStreetMap
             X /= 1000
             Y /= 1000
         end
-        #length(X) > 1 && Winston.plot(p, X, Y, lineStyle.spec, color=lineStyle.color, linewidth=lineStyle.width)
-		length(X) > 1 && Plots.plot!(p, X, Y, color=lineStyle.color,width=lineStyle.width,linestyle=gr_linestyles[lineStyle.spec])
+        length(X) > 1 && Plots.plot!(p, X, Y, color=lineStyle.color,width=lineStyle.width,
+                                     linestyle=gr_linestyles[lineStyle.spec])
     end
 end
 
@@ -72,7 +79,9 @@ end
 ### Draw Buildings ###
 ######################
 
-function draw_buildings!(p::Plots.Plot,nodes::Dict{Int,T}, buildings::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
+function draw_buildings!(p::Plots.Plot,nodes::Dict{Int,T},
+                         buildings::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,
+                         km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
     if isa(style, OpenStreetMapXPlot.Style)
         OpenStreetMapXPlot.draw_ways!(p,nodes,buildings,style,km)
     else
@@ -85,7 +94,9 @@ end
 ### Draw Roadways ###
 #####################
 
-function draw_roadways!(p::Plots.Plot,nodes::Dict{Int,T}, roadways::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
+function draw_roadways!(p::Plots.Plot,nodes::Dict{Int,T},
+                        roadways::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,
+                        km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
     if isa(style, OpenStreetMapXPlot.Style)
         OpenStreetMapXPlot.draw_ways!(p,nodes,roadways,style,km)
     else
@@ -98,7 +109,9 @@ end
 ### Draw Walkways ###
 #####################
 
-function draw_walkways!(p::Plots.Plot,nodes::Dict{Int,T}, walkways::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
+function draw_walkways!(p::Plots.Plot,nodes::Dict{Int,T},
+                        walkways::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,
+                        km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
     if isa(style, OpenStreetMapXPlot.Style)
         OpenStreetMapXPlot.draw_ways!(p,nodes,walkways,style,km)
     else
@@ -111,7 +124,9 @@ end
 ### Draw Cycleways ###
 ######################
 
-function draw_cycleways!(p::Plots.Plot,nodes::Dict{Int,T}, cycleways::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
+function draw_cycleways!(p::Plots.Plot,nodes::Dict{Int,T},
+                         cycleways::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,
+                         km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
     if isa(style, OpenStreetMapXPlot.Style)
         OpenStreetMapXPlot.draw_ways!(p,nodes,cycleways,style,km)
     else
@@ -124,7 +139,9 @@ end
 ### Draw Features ###
 #####################
 
-function draw_features!(p::Plots.Plot,nodes::Dict{Int,T}, features::Dict{Int,Tuple{String,String}}, style::OpenStreetMapXPlot.Styles,km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
+function draw_features!(p::Plots.Plot,nodes::Dict{Int,T},
+                        features::Dict{Int,Tuple{String,String}}, style::OpenStreetMapXPlot.Styles,
+                        km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
     if isa(style, OpenStreetMapXPlot.Style)
         X = [OpenStreetMapX.getX(nodes[node]) for node in keys(features)]
         Y = [OpenStreetMapX.getY(nodes[node]) for node in keys(features)]
@@ -132,8 +149,8 @@ function draw_features!(p::Plots.Plot,nodes::Dict{Int,T}, features::Dict{Int,Tup
                 X /= 1000
                 Y /= 1000
         end
-        #length(X) > 1 && Winston.plot(p, X, Y, style.spec, color=style.color, linewidth=style.width)
-		length(X) > 1 && Plots.plot!(p, X, Y, color=style.color,width=style.width,linestyle=gr_linestyles[style.spec])
+        length(X) > 1 && Plots.plot!(p, X, Y, color=style.color,width=style.width,
+                                     linestyle=gr_linestyles[style.spec])
     else
         classes = OpenStreetMapX.classify_features(features)
         for (key,val) in style
@@ -144,8 +161,8 @@ function draw_features!(p::Plots.Plot,nodes::Dict{Int,T}, features::Dict{Int,Tup
                 X /= 1000
                 Y /= 1000
             end
-            #length(X) > 1 && Winston.plot(p, X, Y, val.spec, color=val.color, linewidth=val.width)
-			length(X) > 1 && Plots.plot!(p, X, Y, color=val.color,width=val.width,linestyle=gr_linestyles[val.spec])
+            length(X) > 1 && Plots.plot!(p, X, Y, color=val.color,width=val.width,
+                                         linestyle=gr_linestyles[val.spec])
         end
     end
 end
@@ -154,21 +171,21 @@ end
 ### Generic Map Plot ###
 ########################
 function plotmap(nodes::Dict{Int,T},
-                                    bounds::Union{Nothing,OpenStreetMapX.Bounds{T}} = nothing;
-                                    buildings::Union{Nothing,Vector{OpenStreetMapX.Way}} = nothing,
-                                    buildingStyle::Styles=OpenStreetMapXPlot.Style("0x000000", 1, "-"),
-                                    roadways::Union{Nothing,Vector{OpenStreetMapX.Way}} = nothing,
-                                    roadwayStyle::Styles=OpenStreetMapXPlot.Style("0x007CFF", 1.5, "-"),
-                                    walkways::Union{Nothing,Vector{OpenStreetMapX.Way}} = nothing,
-                                    walkwayStyle::Styles=OpenStreetMapXPlot.Style("0x007CFF", 1.5, "-"),
-                                    cycleways::Union{Nothing,Vector{OpenStreetMapX.Way}} = nothing,
-                                    cyclewayStyle::Styles=OpenStreetMapXPlot.Style("0x007CFF", 1.5, "-"),
-                                    features::Union{Nothing,Dict{Int64,Tuple{String,String}}} = nothing,
-                                    featureStyle::Styles=OpenStreetMapXPlot.Style("0xCC0000", 2.5, "."),
-                                    width::Int=600,
-									height::Int=600,								
-                                    fontsize::Integer=0,
-                                    km::Bool=false) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
+                 bounds::Union{Nothing,OpenStreetMapX.Bounds{T}} = nothing;
+                 buildings::Union{Nothing,Vector{OpenStreetMapX.Way}} = nothing,
+                 buildingStyle::Styles=OpenStreetMapXPlot.Style("0x000000", 1, "-"),
+                 roadways::Union{Nothing,Vector{OpenStreetMapX.Way}} = nothing,
+                 roadwayStyle::Styles=OpenStreetMapXPlot.Style("0x007CFF", 1.5, "-"),
+                 walkways::Union{Nothing,Vector{OpenStreetMapX.Way}} = nothing,
+                 walkwayStyle::Styles=OpenStreetMapXPlot.Style("0x007CFF", 1.5, "-"),
+                 cycleways::Union{Nothing,Vector{OpenStreetMapX.Way}} = nothing,
+                 cyclewayStyle::Styles=OpenStreetMapXPlot.Style("0x007CFF", 1.5, "-"),
+                 features::Union{Nothing,Dict{Int64,Tuple{String,String}}} = nothing,
+                 featureStyle::Styles=OpenStreetMapXPlot.Style("0xCC0000", 2.5, "."),
+                 width::Int=600,
+                 height::Int=600,                                
+                 fontsize::Integer=0,
+                 km::Bool=false) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
     # Chose labels according to point type and scale
     xlab, ylab = if isa(nodes, Dict{Int,OpenStreetMapX.LLA})
         "Longitude (deg)", "Latitude (deg)"
@@ -184,7 +201,7 @@ function plotmap(nodes::Dict{Int,T},
         #fig = Winston.figure(name="OpenStreetMapX Plot", width=width, height=height)
     #end
     if isa(bounds,Nothing)
-		p = Plots.plot(xlabel=xlab,ylabel=ylab,legend=false,size=(width,height))
+        p = Plots.plot(xlabel=xlab,ylabel=ylab,legend=false,size=(width,height))
     else # Limit plot to specified bounds
         #Winston.xlim(bounds.min_x, bounds.max_x)
         #Winston.ylim(bounds.min_y, bounds.max_y)
@@ -219,10 +236,6 @@ function plotmap(nodes::Dict{Int,T},
     end
     if fontsize > 0
         attr = Dict(:fontsize => fontsize)
-        #Winston.setattr(p.x1, "label_style", attr)
-        #Winston.setattr(p.y1, "label_style", attr)
-        #Winston.setattr(p.x1, "ticklabels_style", attr)
-        #Winston.setattr(p.y1, "ticklabels_style", attr)
     end
     return p
 end
@@ -231,7 +244,9 @@ end
 ### Add Routes to Plot ###
 ##########################
 
-function addroute!(p::Plots.Plot, nodes::Dict{Int,T}, route::Vector{Int}; route_color::String ="0x000053", km::Bool=false) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
+function addroute!(p::Plots.Plot, nodes::Dict{Int,T},
+                   route::Vector{Int}; route_color::String ="0x000053",
+                   km::Bool=false) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
     route_style = OpenStreetMapXPlot.Style(route_color, 3, ";")
     X = [OpenStreetMapX.getX(nodes[node]) for node in route]
     Y = [OpenStreetMapX.getY(nodes[node]) for node in route]
@@ -240,10 +255,9 @@ function addroute!(p::Plots.Plot, nodes::Dict{Int,T}, route::Vector{Int}; route_
         Y /= 1000
     end
     #length(X) > 1 && Winston.plot(p, X, Y, route_style.spec, color=route_style.color, linewidth=route_style.width)
-	if length(X) > 1 
-		Plots.plot!(p, X, Y, color=route_style.color,width=route_style.width,linestyle=gr_linestyles[route_style.spec])
-		Plots.annotate!(p,X[1],Y[1],text("A",15))
-		Plots.annotate!(p,X[end],Y[end],text("B",15))		
-	end
-	
+    if length(X) > 1 
+        Plots.plot!(p, X, Y, color=route_style.color,width=route_style.width,linestyle=gr_linestyles[route_style.spec])
+        Plots.annotate!(p,X[1],Y[1],text("A",15))
+        Plots.annotate!(p,X[end],Y[end],text("B",15))       
+    end
 end
