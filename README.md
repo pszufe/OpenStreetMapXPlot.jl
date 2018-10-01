@@ -3,8 +3,6 @@ This is a complete re-write of OpenStreetMap.jl package - plotting module.
 
 Compared to the original package this module uses `Plots.jl` with GR is used as backend for map vizualization. 
 
-
-
 ## Installation
 
 The current version uses Julia 1.0.0
@@ -28,10 +26,6 @@ p = OpenStreetMapXPlot.plotmap(map_data.nodes, OpenStreetMapX.ENU(map_data.bound
 
 ![](plot_image.png)
 
-
-
 See the `samples` directory for a more complete example with routing and drawing routes.  
 
-
-
-**Any push requests are welcome!**
+**Any pull requests are welcome!**
