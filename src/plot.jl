@@ -1,6 +1,6 @@
-#########################################################
-### Functions for Plotting Using the Plots.jl Package ###
-#########################################################
+###################################################################
+### Functions for Plotting Using PyPlot.jl or Plots.jl Packages ###
+###################################################################
 
 ################################
 ### Styles Used for Plotting ###
@@ -8,14 +8,20 @@
 
 struct Style
     color::String
-    width::Real
-    spec::AbstractString
+    width::Float64
+    spec::String
+	colorPyPlot::String
 end
-Style(x, y) = Style(x, y, "-")
+
+function plotsCorToPy(col::String)::String
+    startswith(col,"0x") ? "#$(col[3:end])" : col
+end
+
+Style(col, width,spec) = Style(col, width, spec,plotsCorToPy(col))
+Style(col, width) = Style(col, width, "-",plotsCorToPy(col))
 
 
 const Styles = Union{OpenStreetMapXPlot.Style,Dict{Int,OpenStreetMapXPlot.Style}}
-gr();
 
 const gr_linestyles = Dict("-" => :solid, ":"=>:dot, ";"=>:dashdot, "-."=>:dashdot,"--"=>:dash)
 
@@ -42,9 +48,10 @@ aspect_ratio(bounds::OpenStreetMapX.Bounds{OpenStreetMapX.ENU}) =
 
 ### Without defined layers ###
 
-function draw_ways!(p::Plots.Plot,nodes::Dict{Int,T}, ways::Vector{OpenStreetMapX.Way},
+function draw_ways!(p,nodes::Dict{Int,T}, ways::Vector{OpenStreetMapX.Way},
                     style::OpenStreetMapXPlot.Styles,
                     km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
+	osm_use_pyplot = (p == :osm_use_pyplot)		
     for way in ways
         X = [OpenStreetMapX.getX(nodes[node]) for node in way.nodes]
         Y = [OpenStreetMapX.getY(nodes[node]) for node in way.nodes]
@@ -52,17 +59,25 @@ function draw_ways!(p::Plots.Plot,nodes::Dict{Int,T}, ways::Vector{OpenStreetMap
             X /= 1000
             Y /= 1000
         end
-        length(X) > 1 && Plots.plot!(p, X, Y, color=style.color,width=style.width,
+        if length(X) > 1 
+			if !osm_use_pyplot
+				Plots.plot!(p, X, Y, color=style.color,width=style.width,
                                      linestyle=gr_linestyles[style.spec])
+			else
+				PyPlot.plot(X, Y, color=style.colorPyPlot,linewidth=style.width,
+                                     linestyle=style.spec)
+			end					
+		end
     end
 end
 
 ### With defined Layers ###
 
-function draw_ways!(p::Plots.Plot,nodes::Dict{Int,T}, ways::Vector{OpenStreetMapX.Way},
+function draw_ways!(p,nodes::Dict{Int,T}, ways::Vector{OpenStreetMapX.Way},
                     class::Dict{Int,Int}, style::OpenStreetMapXPlot.Styles,
                     km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
-    for i = 1:length(ways)
+   	osm_use_pyplot = (p == :osm_use_pyplot)
+	for i = 1:length(ways)
         lineStyle = style[class[ways[i].id]]
         X = [OpenStreetMapX.getX(nodes[node]) for node in ways[i].nodes]
         Y = [OpenStreetMapX.getY(nodes[node]) for node in ways[i].nodes]
@@ -70,8 +85,16 @@ function draw_ways!(p::Plots.Plot,nodes::Dict{Int,T}, ways::Vector{OpenStreetMap
             X /= 1000
             Y /= 1000
         end
-        length(X) > 1 && Plots.plot!(p, X, Y, color=lineStyle.color,width=lineStyle.width,
+        if length(X) > 1 
+			if !osm_use_pyplot
+				Plots.plot!(p, X, Y, color=lineStyle.color,width=lineStyle.width,
                                      linestyle=gr_linestyles[lineStyle.spec])
+			else
+			
+				PyPlot.plot(X, Y, color=lineStyle.colorPyPlot,linewidth=lineStyle.width,
+                                     linestyle=lineStyle.spec)
+			end					
+		end
     end
 end
 
@@ -79,7 +102,7 @@ end
 ### Draw Buildings ###
 ######################
 
-function draw_buildings!(p::Plots.Plot,nodes::Dict{Int,T},
+function draw_buildings!(p,nodes::Dict{Int,T},
                          buildings::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,
                          km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
     if isa(style, OpenStreetMapXPlot.Style)
@@ -94,7 +117,7 @@ end
 ### Draw Roadways ###
 #####################
 
-function draw_roadways!(p::Plots.Plot,nodes::Dict{Int,T},
+function draw_roadways!(p,nodes::Dict{Int,T},
                         roadways::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,
                         km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
     if isa(style, OpenStreetMapXPlot.Style)
@@ -109,7 +132,7 @@ end
 ### Draw Walkways ###
 #####################
 
-function draw_walkways!(p::Plots.Plot,nodes::Dict{Int,T},
+function draw_walkways!(p,nodes::Dict{Int,T},
                         walkways::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,
                         km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
     if isa(style, OpenStreetMapXPlot.Style)
@@ -124,7 +147,7 @@ end
 ### Draw Cycleways ###
 ######################
 
-function draw_cycleways!(p::Plots.Plot,nodes::Dict{Int,T},
+function draw_cycleways!(p,nodes::Dict{Int,T},
                          cycleways::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,
                          km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
     if isa(style, OpenStreetMapXPlot.Style)
@@ -139,18 +162,26 @@ end
 ### Draw Features ###
 #####################
 
-function draw_features!(p::Plots.Plot,nodes::Dict{Int,T},
+function draw_features!(p,nodes::Dict{Int,T},
                         features::Dict{Int,Tuple{String,String}}, style::OpenStreetMapXPlot.Styles,
                         km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
-    if isa(style, OpenStreetMapXPlot.Style)
+    osm_use_pyplot = (p == :osm_use_pyplot)
+	if isa(style, OpenStreetMapXPlot.Style)
         X = [OpenStreetMapX.getX(nodes[node]) for node in keys(features)]
         Y = [OpenStreetMapX.getY(nodes[node]) for node in keys(features)]
         if isa(nodes,Dict{Int,OpenStreetMapX.ENU}) && km
                 X /= 1000
                 Y /= 1000
         end
-        length(X) > 1 && Plots.plot!(p, X, Y, color=style.color,width=style.width,
-                                     linestyle=gr_linestyles[style.spec])
+        if length(X) > 1 
+			if !osm_use_pyplot
+				Plots.plot!(p, X, Y, color=style.color,width=style.width,
+											 linestyle=gr_linestyles[style.spec])
+			else
+				PyPlot.plot(X, Y, color=style.colorPyPlot,linewidth=style.width,
+											 linestyle=style.spec)
+			end
+		end
     else
         classes = OpenStreetMapX.classify_features(features)
         for (key,val) in style
@@ -161,8 +192,15 @@ function draw_features!(p::Plots.Plot,nodes::Dict{Int,T},
                 X /= 1000
                 Y /= 1000
             end
-            length(X) > 1 && Plots.plot!(p, X, Y, color=val.color,width=val.width,
+			if length(X) > 1 
+				if !osm_use_pyplot
+					Plots.plot!(p, X, Y, color=val.color,width=val.width,
                                          linestyle=gr_linestyles[val.spec])
+				else
+					PyPlot.plot(X, Y, color=val.colorPyPlot,linewidth=val.width,
+                                         linestyle=val.spec)
+				end
+			end
         end
     end
 end
@@ -185,8 +223,9 @@ function plotmap(nodes::Dict{Int,T},
                  width::Int=600,
                  height::Int=600,                                
                  fontsize::Integer=0,
-                 km::Bool=false) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
-    # Chose labels according to point type and scale
+                 km::Bool=false, use_plain_pyplot=false) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
+
+	# Chose labels according to point type and scale
     xlab, ylab = if isa(nodes, Dict{Int,OpenStreetMapX.LLA})
         "Longitude (deg)", "Latitude (deg)"
     elseif km
@@ -194,14 +233,15 @@ function plotmap(nodes::Dict{Int,T},
     else
         "East (m)", "North (m)"
     end
-    # Calculating aspect Ratio:
-    #height = isa(bounds,Nothing) ? width : round(Int, width / aspect_ratio(bounds))
-    #if Winston.output_surface != :none # Allow for plotting in IJulia/Jupyter to work
-        # Create the figure
-        #fig = Winston.figure(name="OpenStreetMapX Plot", width=width, height=height)
-    #end
+
+	p = :osm_use_pyplot  #will be overwritten if Plots.jl is used
     if isa(bounds,Nothing)
-        p = Plots.plot(xlabel=xlab,ylabel=ylab,legend=false,size=(width,height))
+	    if !use_plain_pyplot
+			p = Plots.plot(Xlabel=xlab,ylabel=ylab,legend=false,size=(width,height))
+		else 
+			PyPlot.plot(Xlabel=xlab,ylabel=ylab,legend=false,size=(width,height))			
+		end
+		
     else # Limit plot to specified bounds
         #Winston.xlim(bounds.min_x, bounds.max_x)
         #Winston.ylim(bounds.min_y, bounds.max_y)
@@ -212,7 +252,11 @@ function plotmap(nodes::Dict{Int,T},
             xrange = (bounds.min_x, bounds.max_x)
             yrange = (bounds.min_y, bounds.max_y)
         end
-        p = Plots.plot(xlabel=xlab,ylabel=ylab,xlims=xrange,ylims=yrange,legend=false,size=(width,height))
+		if !use_plain_pyplot
+			p = Plots.plot(Xlabel=xlab,ylabel=ylab,xlims=xrange,ylims=yrange,legend=false,size=(width,height))
+		else
+			PyPlot.plot(Xlabel=xlab,ylabel=ylab,xlims=xrange,ylims=yrange,legend=false,size=(width,height))
+		end
     end
     # Draw all buildings
     if !isa(buildings,Nothing)
@@ -240,14 +284,23 @@ function plotmap(nodes::Dict{Int,T},
     return p
 end
 
+plotmap(m::OpenStreetMapX.MapData;roadwayStyle = OpenStreetMapXPlot.LAYER_STANDARD, width=600, height=600, use_plain_pyplot=false) = plotmap(m.nodes, OpenStreetMapX.ENU(m.bounds), roadways=m.roadways,roadwayStyle = roadwayStyle, width=width, height=height, use_plain_pyplot=use_plain_pyplot)
+
 ##########################
 ### Add Routes to Plot ###
 ##########################
 
-function addroute!(p::Plots.Plot, nodes::Dict{Int,T},
+function addroute!(p, m::OpenStreetMapX.MapData,
+                   route::Vector{Int}; route_color::String ="0x000053",
+                   km::Bool=false)
+	addroute!(p, m.nodes, route, route_color=route_color, km=km)
+end
+
+function addroute!(p, nodes::Dict{Int,T},
                    route::Vector{Int}; route_color::String ="0x000053",
                    km::Bool=false) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
-    route_style = OpenStreetMapXPlot.Style(route_color, 3, ";")
+	osm_use_pyplot = (p == :osm_use_pyplot)
+    route_style = OpenStreetMapXPlot.Style(route_color, 3, "--")
     X = [OpenStreetMapX.getX(nodes[node]) for node in route]
     Y = [OpenStreetMapX.getY(nodes[node]) for node in route]
     if isa(nodes,Dict{Int,OpenStreetMapX.ENU}) && km
@@ -256,8 +309,32 @@ function addroute!(p::Plots.Plot, nodes::Dict{Int,T},
     end
     #length(X) > 1 && Winston.plot(p, X, Y, route_style.spec, color=route_style.color, linewidth=route_style.width)
     if length(X) > 1 
-        Plots.plot!(p, X, Y, color=route_style.color,width=route_style.width,linestyle=gr_linestyles[route_style.spec])
-        Plots.annotate!(p,X[1],Y[1],text("A",15))
-        Plots.annotate!(p,X[end],Y[end],text("B",15))       
+		if !osm_use_pyplot
+			Plots.plot!(p, X, Y, color=route_style.color,width=route_style.width,linestyle=gr_linestyles[route_style.spec])
+			Plots.annotate!(p,X[1],Y[1],Plots.text("A",15))
+			Plots.annotate!(p,X[end],Y[end],Plots.text("B",15))       
+		else
+			PyPlot.plot(X, Y, color=route_style.colorPyPlot,linewidth=route_style.width,linestyle=route_style.spec)
+			PyPlot.text(X[1],Y[1],"A")
+			PyPlot.text(X[end],Y[end],"B")
+		end
     end
+	p
+end
+
+function plot_nodes!(p,m::OpenStreetMapX.MapData,nodeids::Vector{Int};start_numbering_from::Union{Int,Nothing}=1, km::Bool=false) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
+	(length(nodeids) == 0) && return
+	osm_use_pyplot = (p == :osm_use_pyplot)
+	divkm = (isa(m.nodes[nodeids[1]],OpenStreetMapX.ENU) && km) ? 1000.0 : 1.0
+    for i in 1:length(nodeids)
+		X = OpenStreetMapX.getX(m.nodes[nodeids[i]]) / divkm
+		Y = OpenStreetMapX.getY(m.nodes[nodeids[i]]) / divkm
+		num = string(start_numbering_from == nothing ? nodeids[i] : (i-1+start_numbering_from))
+		if !osm_use_pyplot
+			Plots.annotate!(p,X,Y,Plots.text(num,15))
+		else
+			PyPlot.text(X,Y,num)
+		end
+   end
+   p
 end

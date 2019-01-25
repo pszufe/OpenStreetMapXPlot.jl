@@ -1,9 +1,11 @@
 module OpenStreetMapXPlot
 
-using Plots
 using OpenStreetMapX
 
-export plotmap, addroute! #Plotting
+import Plots
+import PyPlot 
+
+export plotmap, addroute!, plot_nodes! #Plotting
 
 include("plot.jl") #plotting
 include("layers.jl") #plotting
