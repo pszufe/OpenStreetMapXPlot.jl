@@ -3,7 +3,7 @@
 *.jl.mem
 *.zip
 *.xml
-*.osm
+./*.osm
 *.data
 *.csv
 *.xlsx

@@ -1,11 +1,14 @@
 # OpenStreetMapXPlot.jl
-This is a complete re-write of OpenStreetMap.jl package - plotting module.  
+This is a plotting companion for the [OpenStreetMapX.jl](https://github.com/pszufe/OpenStreetMapX.jl) package. 
 
-Compared to the original package this module uses `Plots.jl` with GR is used as backend for map vizualization. 
+The package provides to plotting mechanisms for map vizualization:
+
+- `Plots.jl` with GR as a back-end
+- plotting directly to `PyPlot.jl` (please note that due to slower painting speed this option is reasonable only for small maps up to few thousand nodes)
 
 ## Installation
 
-The current version uses Julia 1.0.0
+The current version has been tested with Julia 1.0.3
 
 ```julia
 using Pkg
@@ -13,20 +16,53 @@ Pkg.add(PackageSpec(url="https://github.com/pszufe/OpenStreetMapX.jl"))
 Pkg.add(PackageSpec(url="https://github.com/pszufe/OpenStreetMapXPlot.jl"))
 ```
 
-Note that currently `Plots.jl` cannot be precompiled and hence the second command will show several warnings. 
-
 ## Usage
 
-```julia
-using OpenStreetMapX, OpenStreetMapXPlot
-map_data = OpenStreetMapX.get_map_data("/home/ubuntu/", "mymap.osm");
+We will show a full scenario including routing. Let us start by preparing the data and calculating a sample route. 
 
-p = OpenStreetMapXPlot.plotmap(map_data.nodes, OpenStreetMapX.ENU(map_data.bounds), roadways=map_data.roadways,roadwayStyle = OpenStreetMapXPlot.LAYER_STANDARD, width=600, height=600)
+```julia
+using OpenStreetMapX
+m = OpenStreetMapX.get_map_data("test/data/reno_east3.osm");
+import Random
+Random.seed!(0);
+pointA = point_to_nodes(generate_point_in_bounds(m), m)
+pointB = point_to_nodes(generate_point_in_bounds(m), m)
+sr = OpenStreetMapX.shortest_route(m, pointA, pointB)[1]
 ```
+
+Once the map data is in the memory we can start plotting. Let us start with `Plots.jl` with a `GR` back-end (this is the recommended approach due to GR's plotting speed, however due to Julia compiling process *time-to-the-first-plot* is around one minute, while subsequent plots can be created within few seconds). 
+
+```julia
+using OpenStreetMapXPlot
+import Plots
+Plots.gr()
+p = OpenStreetMapXPlot.plotmap(m,width=600,height=400);
+addroute!(p,m,sr;route_color="red");
+plot_nodes!(p,m,[sr[1],sr[end]],start_numbering_from=nothing,fontsize=13,color="pink");
+p
+```
+
+
 
 ![](plot_image.png)
 
-See the `samples` directory for a more complete example with routing and drawing routes.  
+Now, let us paint the same route using the plain `PyPlot.jl` back-end. 
+
+```julia
+using OpenStreetMapXPlot
+import PyPlot
+p=OpenStreetMapXPlot.plotmap(m,width=600,height=400,use_plain_pyplot=true);
+addroute!(p,m,sr;route_color="red");
+plot_nodes!(p,m,[sr[1],sr[end]],start_numbering_from=nothing,fontsize=13,color="pink");
+```
+
+![](plot_image_pyplot.png)
+
+Note that when using `PyPlot.jl` in Atom, depending on your configuration you might need to add `PyPlot.display_figs()` to actually see the figure
+
+
+
+
 
 **Any pull requests are welcome!**
 
