@@ -13,3 +13,5 @@
 deps/deps.jl
 *.key
 .ipynb_*
+docs/build/ 
+docs/site/ 
