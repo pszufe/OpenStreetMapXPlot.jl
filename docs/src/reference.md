@@ -4,7 +4,8 @@ Reference
 ```@meta
 CurrentModule = OpenStreetMapXPlot
 DocTestSetup = quote
-    using OpenStreetMapXPlot
+    using OpenStreetMapX
+	using OpenStreetMapXPlot
 end
 ```
 

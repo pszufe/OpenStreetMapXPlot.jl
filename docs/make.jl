@@ -12,7 +12,9 @@ end
 
 makedocs(
     sitename = "OpenStreetMapXPlot",
-    format = Documenter.HTML(),
+    format = format = Documenter.HTML(
+        prettyurls = get(ENV, "CI", nothing) == "true"
+    ),
     modules = [OpenStreetMapXPlot],
     pages = ["index.md", "reference.md"],
     doctest = true
