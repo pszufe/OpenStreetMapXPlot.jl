@@ -1,17 +1,3 @@
 *.jl.cov
 *.jl.*.cov
 *.jl.mem
-*.zip
-*.xml
-./*.osm
-*.data
-*.csv
-*.xlsx
-*.xls
-*.htm
-*.html
-deps/deps.jl
-*.key
-.ipynb_*
-docs/build/ 
-docs/site/ 
