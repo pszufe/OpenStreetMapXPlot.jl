@@ -14,7 +14,7 @@ notifications:
   email: false
 
 script:
-  - echo "Current folder script: $(pwd)"
+  - julia -E 'string("script folder ", pwd())'
   - julia -e 'using Pkg; Pkg.add(PackageSpec(url="https://github.com/pszufe/OpenStreetMapX.jl")); Pkg.clone(pwd()); Pkg.build("OpenStreetMapXPlot"); Pkg.test("OpenStreetMapXPlot"; coverage=true)';
 
 after_success:
@@ -27,7 +27,7 @@ jobs:
       julia: 1.0
       os: linux
       script:
-        - echo "Current folder docs: $(pwd)"
+        - julia -E 'string("docs folder ", pwd())'
         - julia --project=docs/ -e 'using Pkg; Pkg.instantiate(); Pkg.add(PackageSpec(url="https://github.com/pszufe/OpenStreetMapX.jl")); Pkg.develop(PackageSpec(path=pwd()))'
         - julia --project=docs/ docs/make.jl
         - ls */* 
