@@ -1,7 +1,7 @@
 name = "OpenStreetMapXPlot"
 uuid = "d3d4fdd0-c191-11e8-3358-a3629b56487d"
 authors = ["Przemyslaw Szufel <pszufe@gmail.com>", "Bartosz Pankratz <bartosz.pankratz@gmail.com>", "Anna Szczurek <annaszczurek2@gmail.com>", "Bogumil Kaminski <bogumil.kaminski@gmail.com>", "Pawel Pralat <pralat@ryerson.ca>"]
-version = "0.1.0"
+version = "0.1.2"
 
 [deps]
 OpenStreetMapX = "5c67c38e-c187-11e8-2be6-e3a6a3a5610f"
