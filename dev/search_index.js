@@ -29,7 +29,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Reference",
     "title": "Reference",
     "category": "section",
-    "text": "CurrentModule = OpenStreetMapXPlot\nDocTestSetup = quote\n    using OpenStreetMapXPlot\nend"
+    "text": "CurrentModule = OpenStreetMapXPlot\nDocTestSetup = quote\n    using OpenStreetMapX\n	using OpenStreetMapXPlot\nend"
 },
 
 {
