@@ -23,17 +23,22 @@ script:
 
 after_success:
   - julia -E 'string("after_success folder ", pwd())'
-  - julia -e 'using Pkg; cd(Pkg.dir("OpenStreetMapXPlot")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())';
+  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())';
 #  - julia -e 'if VERSION >= v"0.7.0-" using Pkg end; cd(Pkg.dir("OpenStreetMapXPlot")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())';
 
 jobs:
   include:
+    - stage: "Test"
+      julia: 1.0
+      os: linux
+      script:
+        - julia -E 'string("Build folder ", pwd())'
+        - julia -e 'using Pkg; Pkg.add(PackageSpec(url="https://github.com/pszufe/OpenStreetMapX.jl")); Pkg.instantiate(); Pkg.build("OpenStreetMapXPlot"); Pkg.test("OpenStreetMapXPlot"; coverage=true)'
     - stage: "Documentation"
       julia: 1.0
       os: linux
       script:
-        - julia -E 'string("curr folder ", pwd())'
-        - julia -e 'using Pkg; Pkg.add(PackageSpec(url="https://github.com/pszufe/OpenStreetMapX.jl")); Pkg.clone(pwd()); Pkg.build("OpenStreetMapXPlot"); Pkg.test("OpenStreetMapXPlot"; coverage=true)';
+        - julia -E 'string("Docs folder ", pwd())'
         - julia --project=docs/ -e 'using Pkg; Pkg.add(PackageSpec(url="https://github.com/pszufe/OpenStreetMapX.jl")); Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd()))'
         - julia --project=docs/ docs/make.jl
         - ls */* 
