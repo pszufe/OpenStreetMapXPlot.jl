@@ -19,6 +19,7 @@ notifications:
 
 script:
   - julia -E 'string("script folder ", pwd())'
+  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
   #- julia -e 'using Pkg; Pkg.add(PackageSpec(url="https://github.com/pszufe/OpenStreetMapX.jl")); Pkg.clone(pwd()); Pkg.build("OpenStreetMapXPlot"); Pkg.test("OpenStreetMapXPlot"; coverage=true)';
 
 after_success:
@@ -33,7 +34,7 @@ jobs:
       script:
         - julia -E 'string("Build folder ", pwd())'
         - julia -e 'using Pkg; Pkg.add(PackageSpec(url="https://github.com/pszufe/OpenStreetMapX.jl")); Pkg.instantiate(); Pkg.build("OpenStreetMapXPlot"); Pkg.test("OpenStreetMapXPlot"; coverage=true)'
-        - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
+        - ls */* 
         - julia -E 'string("Docs folder ", pwd())'
         - julia --project=docs/ -e 'using Pkg; Pkg.add(PackageSpec(url="https://github.com/pszufe/OpenStreetMapX.jl")); Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd()))'
         - julia --project=docs/ docs/make.jl
