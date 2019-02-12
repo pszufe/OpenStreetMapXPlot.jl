@@ -27,15 +27,15 @@ version = "0.9.5"
 
 [[Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
-git-tree-sha1 = "ec61a16eed883ad0cfa002d7489b3ce6d039bb9a"
+git-tree-sha1 = "49269e311ffe11ac5b334681d212329002a9832a"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "1.4.0"
+version = "1.5.1"
 
 [[Conda]]
 deps = ["Compat", "JSON", "VersionParsing"]
-git-tree-sha1 = "fb86fe40cb5b35990e368709bfdc1b46dbb99dac"
+git-tree-sha1 = "b625d802587c2150c279a40a646fba63f9bd8187"
 uuid = "8f4d0f93-b110-5947-807f-2305c1781a2d"
-version = "1.1.1"
+version = "1.2.0"
 
 [[Contour]]
 deps = ["LinearAlgebra", "StaticArrays", "Test"]
@@ -144,9 +144,9 @@ uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 
 [[MbedTLS]]
 deps = ["BinaryProvider", "Dates", "Libdl", "Random", "Sockets", "Test"]
-git-tree-sha1 = "c93a87da4081a3de781f34e0540175795a2ce83d"
+git-tree-sha1 = "40b4a9149f0967714991328b8155c9ff5f91e755"
 uuid = "739be429-bea8-5141-9913-cc70e7f3736d"
-version = "0.6.6"
+version = "0.6.7"
 
 [[Measures]]
 deps = ["Test"]
@@ -171,11 +171,11 @@ version = "0.3.2"
 
 [[OpenStreetMapX]]
 deps = ["HTTP", "JSON", "LibExpat", "LightGraphs", "Serialization", "SparseArrays"]
-git-tree-sha1 = "ed1060e3239e5b1185ca72c26d64c0fc16a94c6e"
+git-tree-sha1 = "b441eb9a2ddf16280ce627d292a09adf36430ad5"
 repo-rev = "master"
 repo-url = "https://github.com/pszufe/OpenStreetMapX.jl"
-uuid = "5c67c38e-c187-11e8-2be6-e3a6a3a5610f"
-version = "0.1.1"
+uuid = "86cd37e6-c0ff-550b-95fe-21d72c8d4fc9"
+version = "0.1.5"
 
 [[OrderedCollections]]
 deps = ["Random", "Serialization", "Test"]
