@@ -23,9 +23,13 @@ p = OpenStreetMapXPlot.plotmap(m)
 @test addroute!(p,m,sr1;route_color="red") == p
 @test plot_nodes!(p,m,[sr1[1],sr1[end]],start_numbering_from=nothing,fontsize=13,color="pink") == p
 
+trk = [LLA(m.bounds.min_y,m.bounds.min_x,0.0), LLA(m.bounds.max_y,m.bounds.max_x,0.0)]
+@test addroute!(p,m,trk;route_color="red") == p
 
 p=OpenStreetMapXPlot.plotmap(m,use_plain_pyplot=true)
 @test p == :osm_use_pyplot
 @test addroute!(p,m,sr1;route_color="red") == p
 @test plot_nodes!(p,m,[sr1[1],sr1[end]],start_numbering_from=nothing,fontsize=13,color="pink") == p
+
+@test addroute!(p,m,trk;route_color="red") == p
 
