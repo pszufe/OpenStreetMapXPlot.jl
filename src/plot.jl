@@ -401,7 +401,7 @@ end
                    km::Bool=false, 
                    start_name="A", end_name="B", 
                    fontsize=15
-                   ) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
+                   )
                    
 Adds a `route` in LLA coordinates to the plot `p`.
 
