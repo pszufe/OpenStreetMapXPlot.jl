@@ -395,6 +395,49 @@ function addroute!(p, nodes::Dict{Int,T},
 end
 
 """
+    addroute!(p, m::OpenStreetMapX.MapData,
+                   route::Vector{OpenStreetMapX.LLA}; 
+                   route_color::String ="0x000053",
+                   km::Bool=false, 
+                   start_name="A", end_name="B", 
+                   fontsize=15
+                   )
+                   
+Adds a `route` in LLA coordinates to the plot `p`.
+
+The first element from the list of route coordinates `route` will be annoted by `start_name` 
+while the last will be annotated by `end_name`.
+    
+Returns an object that can be used for further plot updates.
+                   
+"""
+function addroute!(p, m::OpenStreetMapX.MapData,
+                   route::Vector{OpenStreetMapX.LLA}; route_color::String ="0x000053",
+                   km::Bool=false, start_name="A", end_name="B", fontsize=15)
+    osm_use_pyplot = (p == :osm_use_pyplot)
+    route_style = OpenStreetMapXPlot.Style(route_color, 3, "--")
+    routeENU = [ENU(lla, m.bounds) for lla in route]
+    X = map(enu->enu.east, routeENU)
+    Y = map(enu->enu.north, routeENU)
+    if km
+        X /= 1000
+        Y /= 1000
+    end
+    if length(X) > 1
+        if !osm_use_pyplot
+            Plots.plot!(p, X, Y, color=route_style.color,width=route_style.width,linestyle=gr_linestyles[route_style.spec])
+            Plots.annotate!(p,X[1],Y[1],Plots.text(start_name,fontsize))
+            Plots.annotate!(p,X[end],Y[end],Plots.text(end_name,fontsize))
+        else
+            PyPlot.plot(X, Y, color=route_style.colorPyPlot,linewidth=route_style.width,linestyle=route_style.spec)
+            PyPlot.text(X[1],Y[1],start_name,fontsize=fontsize)
+            PyPlot.text(X[end],Y[end],end_name,fontsize=fontsize)
+        end
+    end
+    p
+end
+
+"""
     plot_nodes!(p, m::OpenStreetMapX.MapData, 
         nodeids::Vector{Int};
         start_numbering_from::Union{Int,Nothing}=1, 
