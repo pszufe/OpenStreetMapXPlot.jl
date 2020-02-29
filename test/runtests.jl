@@ -1,3 +1,5 @@
+println("Running tests at $(pwd())")
+ 
 using Test, OpenStreetMapX
 
 const m = OpenStreetMapX.get_map_data("data/reno_east3.osm",use_cache=false);
@@ -7,13 +9,16 @@ Random.seed!(0);
 const pointA = point_to_nodes(generate_point_in_bounds(m), m)
 const pointB = point_to_nodes(generate_point_in_bounds(m), m)
 
-const sr1, shortest_distance1, shortest_time1 = OpenStreetMapX.shortest_route(m, pointA, pointB)
-@assert length(sr1) > 2
+sr1, shortest_distance1, shortest_time1 = OpenStreetMapX.shortest_route(m, pointA, pointB)
+@assert length(sr1) > 0
 
-using OpenStreetMapXPlot
 ENV["PLOTS_TEST"] = "true" #copied from Plots.jl tests
 ENV["GKSwstype"] = "100" #copied from Plots.jl tests
 ENV["MPLBACKEND"]="agg" # no GUI - copied from PyPlot.jl tests
+
+using OpenStreetMapXPlot
+println("OpenStreetMapXPlot is located at $(pathof(OpenStreetMapXPlot))")
+
 
 import Plots
 Plots.gr()
