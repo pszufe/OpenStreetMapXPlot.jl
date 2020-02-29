@@ -8,6 +8,6 @@ import PyPlot
 export plotmap, addroute!, plot_nodes! #Plotting
 
 include("plot.jl") #plotting
-include("layers.jl") #plotting
+include("layers.jl") #colors
 
 end #module

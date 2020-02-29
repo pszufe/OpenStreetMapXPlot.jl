@@ -1,11 +1,23 @@
-###################################################################
-### Functions for Plotting Using PyPlot.jl or Plots.jl Packages ###
-###################################################################
+###
+# Functions for Plotting Using PyPlot.jl or Plots.jl Packages
+###
 
-################################
-### Styles Used for Plotting ###
-################################
+"""
+	struct Style
+		color::String
+		width::Float64
+		spec::String
+		colorPyPlot::String
+	end
 
+Style of plot. Node that when using PyPlot color is provided separately.
+
+For most cases you will use constructor declared as:
+```julia
+Style(col, width, spec="-")
+```
+
+"""
 struct Style
     color::String
     width::Float64
@@ -17,20 +29,16 @@ function plotsCorToPy(col::String)::String
     startswith(col,"0x") ? "#$(col[3:end])" : col
 end
 
-Style(col, width,spec) = Style(col, width, spec,plotsCorToPy(col))
-Style(col, width) = Style(col, width, "-",plotsCorToPy(col))
 
+Style(col, width, spec="-") = Style(col, width, spec,plotsCorToPy(col))
 
 const Styles = Union{OpenStreetMapXPlot.Style,Dict{Int,OpenStreetMapXPlot.Style}}
 
 const gr_linestyles = Dict("-" => :solid, ":"=>:dot, ";"=>:dashdot, "-."=>:dashdot,"--"=>:dash)
 
-####################
-### Aspect Ratio ###
-####################
-
-### Compute approximate "aspect ratio" at mean latitude ###
-
+"""
+Compute approximate "aspect ratio" at mean latitude
+"""
 function aspect_ratio(bounds::OpenStreetMapX.Bounds{OpenStreetMapX.LLA})
     c_adj = cosd((bounds.min_y + bounds.max_y) / 2)
     range_y = bounds.max_y - bounds.min_y
@@ -38,16 +46,15 @@ function aspect_ratio(bounds::OpenStreetMapX.Bounds{OpenStreetMapX.LLA})
     return range_x * c_adj / range_y
 end
 
-### Compute exact "aspect ratio" ###
+"""
+Compute exact "aspect ratio"
+"""
 aspect_ratio(bounds::OpenStreetMapX.Bounds{OpenStreetMapX.ENU}) =
     (bounds.max_x - bounds.min_x) / (bounds.max_y - bounds.min_y)
 
-#################
-### Draw Ways ###
-#################
-
-### Without defined layers ###
-
+"""
+Draw Ways without defined layers
+"""
 function draw_ways!(p,nodes::Dict{Int,T}, ways::Vector{OpenStreetMapX.Way},
                     style::OpenStreetMapXPlot.Styles,
                     km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
@@ -71,8 +78,9 @@ function draw_ways!(p,nodes::Dict{Int,T}, ways::Vector{OpenStreetMapX.Way},
     end
 end
 
-### With defined Layers ###
-
+"""
+Draw Ways with defined Layers
+"""
 function draw_ways!(p,nodes::Dict{Int,T}, ways::Vector{OpenStreetMapX.Way},
                     class::Dict{Int,Int}, style::OpenStreetMapXPlot.Styles,
                     km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
@@ -98,10 +106,9 @@ function draw_ways!(p,nodes::Dict{Int,T}, ways::Vector{OpenStreetMapX.Way},
     end
 end
 
-######################
-### Draw Buildings ###
-######################
-
+"""
+Draw Buildings
+"""
 function draw_buildings!(p,nodes::Dict{Int,T},
                          buildings::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,
                          km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
@@ -113,10 +120,9 @@ function draw_buildings!(p,nodes::Dict{Int,T},
     end
 end
 
-#####################
-### Draw Roadways ###
-#####################
-
+"""
+Draw Roadways
+"""
 function draw_roadways!(p,nodes::Dict{Int,T},
                         roadways::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,
                         km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
@@ -128,10 +134,9 @@ function draw_roadways!(p,nodes::Dict{Int,T},
     end
 end
 
-#####################
-### Draw Walkways ###
-#####################
-
+"""
+Draw Walkways
+"""
 function draw_walkways!(p,nodes::Dict{Int,T},
                         walkways::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,
                         km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
@@ -143,10 +148,9 @@ function draw_walkways!(p,nodes::Dict{Int,T},
     end
 end
 
-######################
-### Draw Cycleways ###
-######################
-
+"""
+Draw Cycleways
+"""
 function draw_cycleways!(p,nodes::Dict{Int,T},
                          cycleways::Vector{OpenStreetMapX.Way}, style::OpenStreetMapXPlot.Styles,
                          km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
@@ -158,10 +162,9 @@ function draw_cycleways!(p,nodes::Dict{Int,T},
     end
 end
 
-#####################
-### Draw Features ###
-#####################
-
+"""
+Draw Features
+"""
 function draw_features!(p,nodes::Dict{Int,T},
                         features::Dict{Int,Tuple{String,String}}, style::OpenStreetMapXPlot.Styles,
                         km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
@@ -218,22 +221,24 @@ end
                  cyclewayStyle::Styles=OpenStreetMapXPlot.Style("0x007CFF", 1.5, "-"),
                  features::Union{Nothing,Dict{Int64,Tuple{String,String}}} = nothing,
                  featureStyle::Styles=OpenStreetMapXPlot.Style("0xCC0000", 2.5, "."),
-                 width::Int=600,
-                 height::Int=600,
+                 width::Integer=600,
+                 height::Integer=600,
                  fontsize::Integer=0,
                  km::Bool=false, 
-				 use_plain_pyplot=false
+				 use_plain_pyplot::Bool=false
 				 ) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
 
 Plots selected map features for a given dictionary of node locations (`nodes`)
 and within the given `bounds`. 
+The `km` parameter can be used to have a kilometer scale of the map instead of meters.
+
 
 The default plotting backend is `Plots.jl`, however if the `use_plain_pyplot` 
 is set to `true` than `PyPlot.jl` is used 
 (note that due to `PyPlot`'s performance this setting should be used for maps up to few thousands nodes). 
 
-Returns an object that can be used for further plot updates.
 
+Returns an object that can be used for further plot updates.
 """
 function plotmap(nodes::Dict{Int,T},
                  bounds::Union{Nothing,OpenStreetMapX.Bounds{T}} = nothing;
@@ -247,10 +252,10 @@ function plotmap(nodes::Dict{Int,T},
                  cyclewayStyle::Styles=OpenStreetMapXPlot.Style("0x007CFF", 1.5, "-"),
                  features::Union{Nothing,Dict{Int64,Tuple{String,String}}} = nothing,
                  featureStyle::Styles=OpenStreetMapXPlot.Style("0xCC0000", 2.5, "."),
-                 width::Int=600,
-                 height::Int=600,
+                 width::Integer=600,
+                 height::Integer=600,
                  fontsize::Integer=0,
-                 km::Bool=false, use_plain_pyplot=false
+                 km::Bool=false, use_plain_pyplot::Bool=false
                  ) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
 
     # Chose labels according to point type and scale
@@ -271,8 +276,6 @@ function plotmap(nodes::Dict{Int,T},
         end
 
     else # Limit plot to specified bounds
-        #Winston.xlim(bounds.min_x, bounds.max_x)
-        #Winston.ylim(bounds.min_y, bounds.max_y)
         if km && isa(nodes, Dict{Int,OpenStreetMapX.ENU})
             xrange = (bounds.min_x/1000, bounds.max_x/1000)
             yrange = (bounds.min_y/1000, bounds.max_y/1000)
@@ -315,11 +318,12 @@ end
 """
     plotmap(m::OpenStreetMapX.MapData;
         roadwayStyle = OpenStreetMapXPlot.LAYER_STANDARD, 
-        width=600, height=600, use_plain_pyplot=false)
+        width::Integer=600, height::Integer=600, use_plain_pyplot::Bool=false)
     
 Plots `roadways` for a given map `m`.
 
 The width will be set to `width` and the height will be set to `height`.
+The `km` parameter can be used to have a kilometer scale of the map instead of meters.
 
 The default plotting backend is `Plots.jl`, however if the `use_plain_pyplot` 
 is set to `true` than `PyPlot.jl` is used 
@@ -328,7 +332,9 @@ is set to `true` than `PyPlot.jl` is used
 Returns an object that can be used for further plot updates.
 
 """
-plotmap(m::OpenStreetMapX.MapData;roadwayStyle = OpenStreetMapXPlot.LAYER_STANDARD, width=600, height=600, use_plain_pyplot=false) = plotmap(m.nodes, OpenStreetMapX.ENU(m.bounds), roadways=m.roadways,roadwayStyle = roadwayStyle, width=width, height=height, use_plain_pyplot=use_plain_pyplot)
+plotmap(m::OpenStreetMapX.MapData;roadwayStyle = OpenStreetMapXPlot.LAYER_STANDARD, 
+	width::Integer=600, height::Integer=600, km::Bool=false, use_plain_pyplot::Bool=false) = 
+	plotmap(m.nodes, OpenStreetMapX.ENU(m.bounds), roadways=m.roadways,roadwayStyle = roadwayStyle, width=width, height=height, km=km, use_plain_pyplot=use_plain_pyplot)
 
 
 """
@@ -340,6 +346,7 @@ Adds a `route` to the plot `p` representing the map `m`.
 
 The first element from the list of nodes `route` will be annoted by `start_name` 
 while the last will be annotated by `end_name`.
+The `km` parameter can be used to have a kilometer scale of the map instead of meters.
     
 Returns an object that can be used for further plot updates.
 
@@ -364,6 +371,7 @@ Adds a `route` to the plot `p` using the node information stored in `nodes`.
 
 The first element from the list of nodes `route` will be annoted by `start_name` 
 while the last will be annotated by `end_name`.
+The `km` parameter can be used to have a kilometer scale of the map instead of meters.
     
 Returns an object that can be used for further plot updates.
                    
@@ -403,10 +411,12 @@ end
                    fontsize=15
                    )
                    
-Adds a `route` in LLA coordinates to the plot `p`.
+Adds a `route` in LLA coordinates to the plot `p` representing the map `m`.
 
 The first element from the list of route coordinates `route` will be annoted by `start_name` 
 while the last will be annotated by `end_name`.
+The `km` parameter can be used to have a kilometer scale of the map instead of meters.
+
     
 Returns an object that can be used for further plot updates.
                    
@@ -443,17 +453,17 @@ end
         start_numbering_from::Union{Int,Nothing}=1, 
         km::Bool=false, 
         color="darkgreen", 
-        fontsize=10
-        ) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
+        fontsize=10) 
     
 Plots nodes having node identifiers `nodeids` on the plot `p` using map information `m`.
 By default the node indices within the are plotted (e.g. 1, 2, 3...), however,
 setting the parameter `start_numbering_from` to nothing will show actual OSM node identifiers. 
+The `km` parameter can be used to have a kilometer scale of the map instead of meters.
 
 Returns an object that can be used for further plot updates.
-                   
 """
-function plot_nodes!(p,m::OpenStreetMapX.MapData,nodeids::Vector{Int};start_numbering_from ::Union{Int,Nothing}=1, km::Bool=false, color="darkgreen", fontsize=10) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
+function plot_nodes!(p,m::OpenStreetMapX.MapData,nodeids::Vector{Int};
+		start_numbering_from ::Union{Int,Nothing}=1, km::Bool=false, color="darkgreen", fontsize=10)
     (length(nodeids) == 0) && return
     osm_use_pyplot = (p == :osm_use_pyplot)
     divkm = (isa(m.nodes[nodeids[1]],OpenStreetMapX.ENU) && km) ? 1000.0 : 1.0

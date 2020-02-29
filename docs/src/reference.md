@@ -13,6 +13,7 @@ Map plotting functions
 ----------------------
 
 ```@docs
+Style
 plotmap
 addroute!
 plot_nodes!

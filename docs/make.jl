@@ -1,4 +1,5 @@
 using Documenter
+using Pkg
 
 try
     using OpenStreetMapXPlot
@@ -10,17 +11,15 @@ catch
     end
 end
 
+println("Generating docs for module\n$(pathof(OpenStreetMapXPlot))")
+
 makedocs(
     sitename = "OpenStreetMapXPlot",
-    format = format = Documenter.HTML(
-        prettyurls = get(ENV, "CI", nothing) == "true"
-    ),
+    format = format = Documenter.HTML(),
     modules = [OpenStreetMapXPlot],
     pages = ["index.md", "reference.md"],
     doctest = true
 )
-
-
 
 deploydocs(
     repo ="github.com/pszufe/OpenStreetMapXPlot.jl.git",

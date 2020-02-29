@@ -1,12 +1,14 @@
 using Test, OpenStreetMapX
 
-m = OpenStreetMapX.get_map_data("data/reno_east3.osm",use_cache=false);
+const m = OpenStreetMapX.get_map_data("data/reno_east3.osm",use_cache=false);
+
 using Random
 Random.seed!(0);
-pointA = point_to_nodes(generate_point_in_bounds(m), m)
-pointB = point_to_nodes(generate_point_in_bounds(m), m)
+const pointA = point_to_nodes(generate_point_in_bounds(m), m)
+const pointB = point_to_nodes(generate_point_in_bounds(m), m)
 
-sr1, shortest_distance1, shortest_time1 = OpenStreetMapX.shortest_route(m, pointA, pointB)
+const sr1, shortest_distance1, shortest_time1 = OpenStreetMapX.shortest_route(m, pointA, pointB)
+@assert length(sr1) > 2
 
 using OpenStreetMapXPlot
 ENV["PLOTS_TEST"] = "true" #copied from Plots.jl tests
@@ -17,17 +19,21 @@ import Plots
 Plots.gr()
 Plots.default(show=false, reuse=true)
 
-p = OpenStreetMapXPlot.plotmap(m)
-@test typeof(p) == Plots.Plot{Plots.GRBackend}
-@test addroute!(p,m,sr1;route_color="red") == p
-@test plot_nodes!(p,m,[sr1[1],sr1[end]],start_numbering_from=nothing,fontsize=13,color="pink") == p
+const trk = [LLA(m.bounds.min_y,m.bounds.min_x,0.0), LLA(m.bounds.max_y,m.bounds.max_x,0.0)]
 
-trk = [LLA(m.bounds.min_y,m.bounds.min_x,0.0), LLA(m.bounds.max_y,m.bounds.max_x,0.0)]
-@test addroute!(p,m,trk;route_color="red") == p
 
-p=OpenStreetMapXPlot.plotmap(m,use_plain_pyplot=true)
-@test p == :osm_use_pyplot
-@test addroute!(p,m,sr1;route_color="red") == p
-@test plot_nodes!(p,m,[sr1[1],sr1[end]],start_numbering_from=nothing,fontsize=13,color="pink") == p
+@testset "Plots backend " begin
+	p = OpenStreetMapXPlot.plotmap(m)
+	@test typeof(p) == Plots.Plot{Plots.GRBackend}
+	@test addroute!(p,m,sr1;route_color="red") == p
+	@test plot_nodes!(p,m,[sr1[1],sr1[end]],start_numbering_from=nothing,fontsize=13,color="pink") == p
+	@test addroute!(p,m,trk;route_color="red") == p
+end
 
-@test addroute!(p,m,trk;route_color="red") == p
+@testset "PyPlot backend" begin
+	p=OpenStreetMapXPlot.plotmap(m,use_plain_pyplot=true)
+	@test p == :osm_use_pyplot
+	@test addroute!(p,m,sr1;route_color="red") == p
+	@test plot_nodes!(p,m,[sr1[1],sr1[end]],start_numbering_from=nothing,fontsize=13,color="pink") == p
+	@test addroute!(p,m,trk;route_color="red") == p
+end

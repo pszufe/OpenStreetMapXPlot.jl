@@ -1,8 +1,8 @@
 ### Julia OpenStreetMapXPlot Package ###
 ### MIT License                 ###
-### Copyright 2014              ###
 
 ### Standard map display "layers." ###
+
 const LAYER_STANDARD = Dict(
     1 => OpenStreetMapXPlot.Style("0xd97486", 4), # @motorway-fill
     2 => OpenStreetMapXPlot.Style("0xebb36a", 3), # @primary-fill

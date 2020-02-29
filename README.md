@@ -11,12 +11,12 @@ The package provides to plotting mechanisms for map vizualization:
 
 ## Installation
 
-The current version has been tested with Julia 1.0.3
+The current version has been tested with Julia 1.0.5 and Julia 1.3.1
 
 ```julia
 using Pkg
-Pkg.add(PackageSpec(url="https://github.com/pszufe/OpenStreetMapX.jl"))
-Pkg.add(PackageSpec(url="https://github.com/pszufe/OpenStreetMapXPlot.jl"))
+pkg"add OpenStreetMapX"
+pkg"add https://github.com/pszufe/OpenStreetMapXPlot.jl"
 ```
 
 ## Usage
@@ -65,9 +65,6 @@ Note that when using `PyPlot.jl` in Atom, depending on your configuration you mi
 
 
 
-
-
-**Any pull requests are welcome!**
 
 
 
