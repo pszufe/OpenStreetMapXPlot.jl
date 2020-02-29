@@ -1,14 +1,16 @@
 language: julia
 
 os:
-  - osx
   - linux
 
 julia:
   - 1.0
 
-before_install:
-  - julia -e 'using Pkg; Pkg.add.(["PyCall","Conda"]); Pkg.build("PyCall");using PyCall;println("Python for Julia $(PyCall.python) ver. $(PyCall.pyversion)"); using Conda; Conda.add.(["matplotlib"])';
+addons:
+  apt:
+    packages:
+      - python-matplotlib
+      - python3-matplotlib
 
 notifications:
   email: false
