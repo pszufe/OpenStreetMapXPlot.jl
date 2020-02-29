@@ -18,7 +18,7 @@ addons:
 
 script: 
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia -e 'Pkg.clone(pwd()); Pkg.build("OpenStreetMapXPlot"); Pkg.test("OpenStreetMapXPlot"; coverage=true)';
+  - julia -e 'using Pkg;Pkg.clone(pwd()); Pkg.build("OpenStreetMapXPlot"); Pkg.test("OpenStreetMapXPlot"; coverage=true)';
 
 after_success:
   - julia -e 'using Pkg; cd(Pkg.dir("OpenStreetMapXPlot")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
