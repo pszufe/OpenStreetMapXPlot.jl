@@ -419,7 +419,6 @@ function addroute!(p, m::OpenStreetMapX.MapData,
     routeENU = [ENU(lla, m.bounds) for lla in route]
     X = map(enu->enu.east, routeENU)
     Y = map(enu->enu.north, routeENU)
-
     if km
         X /= 1000
         Y /= 1000
