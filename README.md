@@ -1,6 +1,6 @@
 # OpenStreetMapXPlot.jl
 
-Build status for Linux and macOS: [![Build Status](https://travis-ci.org/pszufe/OpenStreetMapXPlot.jl.svg?branch=master)](https://travis-ci.org/pszufe/OpenStreetMapXPlot.jl) 
+Build status: [![Build Status](https://travis-ci.org/pszufe/OpenStreetMapXPlot.jl.svg?branch=master)](https://travis-ci.org/pszufe/OpenStreetMapXPlot.jl) 
 
 Test coverage: [![Coverage Status](https://coveralls.io/repos/github/pszufe/OpenStreetMapXPlot.jl/badge.svg?branch=master)](https://coveralls.io/github/pszufe/OpenStreetMapXPlot.jl?branch=master)   
 
