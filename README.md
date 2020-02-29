@@ -1,6 +1,10 @@
 # OpenStreetMapXPlot.jl
 
-Build status for Linux and macOS: [![Build Status](https://travis-ci.org/pszufe/OpenStreetMapXPlot.jl.svg?branch=master)](https://travis-ci.org/pszufe/OpenStreetMapXPlot.jl) Test coverage: [![Coverage Status](https://coveralls.io/repos/github/pszufe/OpenStreetMapXPlot.jl/badge.svg?branch=master)](https://coveralls.io/github/pszufe/OpenStreetMapXPlot.jl?branch=master)   [Documentation ![](https://img.shields.io/badge/docs-latest-blue.svg)](https://pszufe.github.io/OpenStreetMapXPlot.jl/latest)
+Build status for Linux and macOS: [![Build Status](https://travis-ci.org/pszufe/OpenStreetMapXPlot.jl.svg?branch=master)](https://travis-ci.org/pszufe/OpenStreetMapXPlot.jl) 
+
+Test coverage: [![Coverage Status](https://coveralls.io/repos/github/pszufe/OpenStreetMapXPlot.jl/badge.svg?branch=master)](https://coveralls.io/github/pszufe/OpenStreetMapXPlot.jl?branch=master)   
+
+[Documentation ![](https://img.shields.io/badge/docs-latest-blue.svg)](https://pszufe.github.io/OpenStreetMapXPlot.jl/latest)
 
 This is a plotting companion for the [OpenStreetMapX.jl](https://github.com/pszufe/OpenStreetMapX.jl) package. 
 

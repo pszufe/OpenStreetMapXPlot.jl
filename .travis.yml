@@ -6,13 +6,9 @@ os:
 
 julia:
   - 1.0
-matrix:
-  - PYTHON=Conda-python
-env:
-  - PYTHON=~/.julia/conda/3/bin/python
+
 before_install:
   - julia -e 'using Pkg; Pkg.add.(["PyCall","Conda"]); Pkg.build("PyCall");using PyCall;println("Python for Julia $(PyCall.python) ver. $(PyCall.pyversion)"); using Conda; Conda.add.(["matplotlib"])';
-
 
 notifications:
   email: false
@@ -22,8 +18,7 @@ notifications:
 #  - julia -e 'Pkg.clone(pwd()); Pkg.build("OpenStreetMapXPlot"); Pkg.test("OpenStreetMapXPlot"; coverage=true)';
 
 after_success:
-  - julia -e 'using Pkg; cd(Pkg.dir("OpenStreetMapXPlot")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())';
-
+  - julia -e 'using Pkg; cd(Pkg.dir("OpenStreetMapXPlot")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
 
 jobs:
   include:
