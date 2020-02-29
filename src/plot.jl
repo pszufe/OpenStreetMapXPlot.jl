@@ -411,7 +411,7 @@ while the last will be annotated by `end_name`.
 Returns an object that can be used for further plot updates.
                    
 """
-function OpenStreetMapXPlot.addroute!(p, m::OpenStreetMapX.MapData,
+function addroute!(p, m::OpenStreetMapX.MapData,
                    route::Vector{OpenStreetMapX.LLA}; route_color::String ="0x000053",
                    km::Bool=false, start_name="A", end_name="B", fontsize=15)
     osm_use_pyplot = (p == :osm_use_pyplot)
