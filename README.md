@@ -15,12 +15,12 @@ The package provides to plotting mechanisms for map vizualization:
 
 ## Installation
 
-The current version has been tested with Julia 1.0.5 and Julia 1.3.1
+The current version has been tested with Julia 1.3.1 and Julia 1.5.0
 
 ```julia
 using Pkg
 pkg"add OpenStreetMapX"
-pkg"add https://github.com/pszufe/OpenStreetMapXPlot.jl"
+pkg"add OpenStreetMapXPlot"
 ```
 
 ## Usage
@@ -29,12 +29,14 @@ We will show a full scenario including routing. Let us start by preparing the da
 
 ```julia
 using OpenStreetMapX
-m = OpenStreetMapX.get_map_data("test/data/reno_east3.osm");
+
+pth = joinpath(dirname(pathof(OpenStreetMapX)),"..","test","data","reno_east3.osm")
+m =  get_map_data(pth,use_cache = false);
 import Random
 Random.seed!(0);
 pointA = point_to_nodes(generate_point_in_bounds(m), m)
 pointB = point_to_nodes(generate_point_in_bounds(m), m)
-sr = OpenStreetMapX.shortest_route(m, pointA, pointB)[1]
+sr = shortest_route(m, pointA, pointB)[1]
 ```
 
 Once the map data is in the memory we can start plotting. Let us start with `Plots.jl` with a `GR` back-end (this is the recommended approach due to GR's plotting speed, however due to Julia compiling process *time-to-the-first-plot* is around one minute, while subsequent plots can be created within few seconds). 
