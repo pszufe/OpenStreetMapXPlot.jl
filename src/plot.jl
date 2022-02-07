@@ -479,3 +479,44 @@ function plot_nodes!(p,m::OpenStreetMapX.MapData,nodeids::Vector{Int};
    end
    p
 end
+"""
+    plot_nodes_as_symbols!(p, m::OpenStreetMapX.MapData, 
+        nodeids::Vector{Int};
+        symbols::Union{String,Vector{String}}="*",
+        colors::Union{String,Vector{String}}=["darkgreen"],
+        km::Bool=false, 
+        fontsize=10) 
+    
+Plots nodes having node identifiers `nodeids` on the plot `p` using map information `m`.
+By default the nodes are plotted with the "*" symbol, however,
+setting the parameter `symbols` to a string will plot all node locations as that string. 
+Setting `symbols` to an array of strings will plot each successive location as the symbol 
+in that position of the array, repeating over the string array if the `symbols` array
+is shorter than the `nodeids` array.
+The `km` parameter can be used to have a kilometer scale of the map instead of meters.
+
+Returns an object that can be used for further plot updates.
+"""
+
+function plot_nodes_as_symbols!(p,m::OpenStreetMapX.MapData,nodeids::Vector{Int};
+		                symbols::Union{String,Vector{String}}="*",
+                                colors::Union{String,Vector{String}}=["darkgreen"],
+                                km::Bool=false, fontsize=10)
+    (length(nodeids) == 0) && return
+    osm_use_pyplot = (p == :osm_use_pyplot)
+    divkm = (isa(m.nodes[nodeids[1]],OpenStreetMapX.ENU) && km) ? 1000.0 : 1.0
+    symbols = typeof(symbols)==String ? [symbols] : symbols
+    colors = typeof(colors)==String ? [colors] : colors
+    for i in 1:length(nodeids)
+        X = OpenStreetMapX.getX(m.nodes[nodeids[i]]) / divkm
+        Y = OpenStreetMapX.getY(m.nodes[nodeids[i]]) / divkm
+        j = (i-1)%length(symbols) + 1
+        k = (i-1)%length(colors) + 1
+        if !osm_use_pyplot
+            Plots.annotate!(p,X,Y,Plots.text(symbols[j],fontsize,Symbol(colors[k])))
+        else
+            PyPlot.text(X,Y,symbols[j],color=colors[k],fontsize=fontsize)
+        end
+   end
+   p
+end
