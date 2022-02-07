@@ -322,7 +322,8 @@ end
     
 Plots `roadways` for a given map `m`.
 
-The width will be set to `width` and the height will be set to `height`.
+The width will be set to `width` and the height will be set to `height`. If only one of `width`
+or `height` is set, the other will be set to perserve the aspect ratio of the bounding box.
 The `km` parameter can be used to have a kilometer scale of the map instead of meters.
 
 The default plotting backend is `Plots.jl`, however if the `use_plain_pyplot` 
@@ -332,10 +333,36 @@ is set to `true` than `PyPlot.jl` is used
 Returns an object that can be used for further plot updates.
 
 """
-plotmap(m::OpenStreetMapX.MapData;roadwayStyle = OpenStreetMapXPlot.LAYER_STANDARD, 
-	width::Integer=600, height::Integer=600, km::Bool=false, use_plain_pyplot::Bool=false) = 
-	plotmap(m.nodes, OpenStreetMapX.ENU(m.bounds), roadways=m.roadways,roadwayStyle = roadwayStyle, width=width, height=height, km=km, use_plain_pyplot=use_plain_pyplot)
+function plotmap(m::OpenStreetMapX.MapData;roadwayStyle = OpenStreetMapXPlot.LAYER_STANDARD, 
+	         width::Union{Integer,Nothing}=nothing, height::Union{Integer,Nothing}=nothing, km::Bool=false, use_plain_pyplot::Bool=false)
+     
+    # Set plot aspect ratio to that of bounds (in meters), unless both height and width are specified
+    if width==nothing || height==nothing
+        # Compute aspect ratio
+        if true
+            p1 = ENU(LLA(m.bounds.min_y, m.bounds.min_x), m.bounds)
+            p2 = ENU(LLA(m.bounds.max_y, m.bounds.max_x), m.bounds)
+            w = abs(p2.east - p1.east)
+            h = abs(p2.north - p1.north)
+            aspect_ratio = h/w
+        else
+            # Why doesn't this work?
+            aspect_ratio = OpenStreetMapXPlot.aspect_ratio(m.bounds)
+        end
 
+        if width==nothing && height==nothing
+            width = 600
+            height = Int(round(aspect_ratio*width))
+        elseif height==nothing
+            height = Int(round(aspect_ratio*width))
+        elseif width==nothing
+            width = Int(round(height/aspect_ratio))
+        end
+    end
+
+    plotmap(m.nodes, OpenStreetMapX.ENU(m.bounds), roadways=m.roadways,roadwayStyle = roadwayStyle,
+            width=width, height=height, km=km, use_plain_pyplot=use_plain_pyplot)
+end
 
 """
     plotmap(m::OpenStreetMapX.Mapaddroute!(p, m::OpenStreetMapX.MapData,
