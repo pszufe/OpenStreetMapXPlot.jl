@@ -32,7 +32,8 @@ const trk = [LLA(m.bounds.min_y,m.bounds.min_x,0.0), LLA(m.bounds.max_y,m.bounds
 	@test typeof(p) == Plots.Plot{Plots.GRBackend}
 	@test addroute!(p,m,sr1;route_color="red") == p
 	@test plot_nodes!(p,m,[sr1[1],sr1[end]],start_numbering_from=nothing,fontsize=13,color="pink") == p
-	@test addroute!(p,m,trk;route_color="red") == p
+        @test plot_nodes_as_symbols!(p, m, sr1, symbols=["*","+","#"],colors=["red","green","blue"],fontsize=13) == p
+        @test addroute!(p,m,trk;route_color="red") == p
 end
 
 @testset "PyPlot backend" begin
@@ -40,5 +41,6 @@ end
 	@test p == :osm_use_pyplot
 	@test addroute!(p,m,sr1;route_color="red") == p
 	@test plot_nodes!(p,m,[sr1[1],sr1[end]],start_numbering_from=nothing,fontsize=13,color="pink") == p
+        @test plot_nodes_as_symbols!(p, m, sr1, symbols=["*","+","#"],colors=["red","green","blue"],fontsize=13) == p
 	@test addroute!(p,m,trk;route_color="red") == p
 end
