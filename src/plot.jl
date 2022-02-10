@@ -322,7 +322,8 @@ end
     
 Plots `roadways` for a given map `m`.
 
-The width will be set to `width` and the height will be set to `height`.
+The width will be set to `width` and the height will be set to `height`. If only one of `width`
+or `height` is set, the other will be set to perserve the aspect ratio of the bounding box.
 The `km` parameter can be used to have a kilometer scale of the map instead of meters.
 
 The default plotting backend is `Plots.jl`, however if the `use_plain_pyplot` 
@@ -332,10 +333,27 @@ is set to `true` than `PyPlot.jl` is used
 Returns an object that can be used for further plot updates.
 
 """
-plotmap(m::OpenStreetMapX.MapData;roadwayStyle = OpenStreetMapXPlot.LAYER_STANDARD, 
-	width::Integer=600, height::Integer=600, km::Bool=false, use_plain_pyplot::Bool=false) = 
-	plotmap(m.nodes, OpenStreetMapX.ENU(m.bounds), roadways=m.roadways,roadwayStyle = roadwayStyle, width=width, height=height, km=km, use_plain_pyplot=use_plain_pyplot)
+function plotmap(m::OpenStreetMapX.MapData;roadwayStyle = OpenStreetMapXPlot.LAYER_STANDARD, 
+	         width::Union{Integer,Nothing}=nothing, height::Union{Integer,Nothing}=nothing, km::Bool=false, use_plain_pyplot::Bool=false)
+     
+    # Set plot aspect ratio to that of bounds (in meters), unless both height and width are specified
+    if width==nothing || height==nothing
+        # Compute aspect ratio
+        aspect_ratio = OpenStreetMapXPlot.aspect_ratio(m.bounds)
 
+        if width==nothing && height==nothing
+            width = 600
+            height = Int(round(width/aspect_ratio))
+        elseif height==nothing
+            height = Int(round(width/aspect_ratio))
+        elseif width==nothing
+            width = Int(round(height*aspect_ratio))
+        end
+    end
+
+    plotmap(m.nodes, OpenStreetMapX.ENU(m.bounds), roadways=m.roadways,roadwayStyle = roadwayStyle,
+            width=width, height=height, km=km, use_plain_pyplot=use_plain_pyplot)
+end
 
 """
     plotmap(m::OpenStreetMapX.Mapaddroute!(p, m::OpenStreetMapX.MapData,
@@ -475,6 +493,47 @@ function plot_nodes!(p,m::OpenStreetMapX.MapData,nodeids::Vector{Int};
             Plots.annotate!(p,X,Y,Plots.text(num,fontsize,Symbol(color)))
         else
             PyPlot.text(X,Y,num,color=color,fontsize=fontsize)
+        end
+   end
+   p
+end
+"""
+    plot_nodes_as_symbols!(p, m::OpenStreetMapX.MapData, 
+        nodeids::Vector{Int};
+        symbols::Union{String,Vector{String}}="*",
+        colors::Union{String,Vector{String}}=["darkgreen"],
+        km::Bool=false, 
+        fontsize=10) 
+    
+Plots nodes having node identifiers `nodeids` on the plot `p` using map information `m`.
+By default the nodes are plotted with the "*" symbol, however,
+setting the parameter `symbols` to a string will plot all node locations as that string. 
+Setting `symbols` to an array of strings will plot each successive location as the symbol 
+in that position of the array, repeating over the string array if the `symbols` array
+is shorter than the `nodeids` array.
+The `km` parameter can be used to have a kilometer scale of the map instead of meters.
+
+Returns an object that can be used for further plot updates.
+"""
+
+function plot_nodes_as_symbols!(p,m::OpenStreetMapX.MapData,nodeids::Vector{Int};
+		                symbols::Union{String,Vector{String}}="*",
+                                colors::Union{String,Vector{String}}=["darkgreen"],
+                                km::Bool=false, fontsize=10)
+    (length(nodeids) == 0) && return
+    osm_use_pyplot = (p == :osm_use_pyplot)
+    divkm = (isa(m.nodes[nodeids[1]],OpenStreetMapX.ENU) && km) ? 1000.0 : 1.0
+    symbols = typeof(symbols)==String ? [symbols] : symbols
+    colors = typeof(colors)==String ? [colors] : colors
+    for i in 1:length(nodeids)
+        X = OpenStreetMapX.getX(m.nodes[nodeids[i]]) / divkm
+        Y = OpenStreetMapX.getY(m.nodes[nodeids[i]]) / divkm
+        j = (i-1)%length(symbols) + 1
+        k = (i-1)%length(colors) + 1
+        if !osm_use_pyplot
+            Plots.annotate!(p,X,Y,Plots.text(symbols[j],fontsize,Symbol(colors[k])))
+        else
+            PyPlot.text(X,Y,symbols[j],color=colors[k],fontsize=fontsize)
         end
    end
    p
