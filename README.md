@@ -1,8 +1,5 @@
 # OpenStreetMapXPlot.jl
 
-Build status: [![Build Status](https://travis-ci.org/pszufe/OpenStreetMapXPlot.jl.svg?branch=master)](https://travis-ci.org/pszufe/OpenStreetMapXPlot.jl) 
-
-Test coverage: [![Coverage Status](https://coveralls.io/repos/github/pszufe/OpenStreetMapXPlot.jl/badge.svg?branch=master)](https://coveralls.io/github/pszufe/OpenStreetMapXPlot.jl?branch=master)   
 
 [Documentation ![](https://img.shields.io/badge/docs-latest-blue.svg)](https://pszufe.github.io/OpenStreetMapXPlot.jl/latest)
 
@@ -15,7 +12,7 @@ The package provides to plotting mechanisms for map vizualization:
 
 ## Installation
 
-The current version has been tested with Julia 1.3.1 and Julia 1.5.0
+The current version has been tested with Julia 1.6 and Julia 1.9
 
 ```julia
 using Pkg
@@ -30,8 +27,7 @@ We will show a full scenario including routing. Let us start by preparing the da
 ```julia
 using OpenStreetMapX
 
-pth = joinpath(dirname(pathof(OpenStreetMapX)),"..","test","data","reno_east3.osm")
-m =  get_map_data(pth,use_cache = false);
+m =  get_map_data(sample_map_path(), use_cache = false);
 import Random
 Random.seed!(0);
 pointA = point_to_nodes(generate_point_in_bounds(m), m)
@@ -66,11 +62,6 @@ plot_nodes!(p,m,[sr[1],sr[end]],start_numbering_from=nothing,fontsize=13,color="
 ```
 
 ![](plot_image_pyplot.png)
-
-Note that when using `PyPlot.jl` in Atom, depending on your configuration you might need to add `PyPlot.display_figs()` to actually see the figure
-
-
-
 
 
 
