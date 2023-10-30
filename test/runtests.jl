@@ -1,8 +1,8 @@
 println("Running tests at $(pwd())")
- 
+
 using Test, OpenStreetMapX
 
-const m = OpenStreetMapX.get_map_data("data/reno_east3.osm",use_cache=false);
+const m = OpenStreetMapX.sample_map();
 
 using Random
 Random.seed!(0);

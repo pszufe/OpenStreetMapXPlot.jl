@@ -1,15 +1,18 @@
 using Documenter
 using Pkg
 
-try
-    using OpenStreetMapXPlot
-catch
-    if !("../src/" in LOAD_PATH)
-       push!(LOAD_PATH,"../src/")
-       @info "Added \"../src/\"to the path: $LOAD_PATH "
-       using OpenStreetMapXPlot
+if isfile("src/OpenStreetMapXPlot.jl")
+    if !("." in LOAD_PATH)
+        push!(LOAD_PATH,".")
+    end
+elseif isfile("../src/OpenStreetMapXPlot.jl")
+    if !(".." in LOAD_PATH)
+	   push!(LOAD_PATH,"..")
     end
 end
+
+using OpenStreetMapXPlot
+
 
 println("Generating docs for module\n$(pathof(OpenStreetMapXPlot))")
 
@@ -18,6 +21,7 @@ makedocs(
     format = format = Documenter.HTML(),
     modules = [OpenStreetMapXPlot],
     pages = ["index.md", "reference.md"],
+    checkdocs = :exports,
     doctest = true
 )
 
