@@ -47,7 +47,7 @@ p
 
 
 
-![](plot_image.png)
+![](plot_image_gr.png)
 
 
 
