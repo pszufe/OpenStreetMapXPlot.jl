@@ -3,16 +3,14 @@
 
 [Documentation ![](https://img.shields.io/badge/docs-latest-blue.svg)](https://pszufe.github.io/OpenStreetMapXPlot.jl/latest)
 
-This is a plotting companion for the [OpenStreetMapX.jl](https://github.com/pszufe/OpenStreetMapX.jl) package. 
+This is a plotting companion for the [OpenStreetMapX.jl](https://github.com/pszufe/OpenStreetMapX.jl) package.
 
-The package provides to plotting mechanisms for map vizualization:
-
-- `Plots.jl` with GR as a back-end
-- plotting directly to `PyPlot.jl` (please note that due to slower painting speed this option is reasonable only for small maps up to few thousand nodes)
+The package provides plotting mechanisms for map vizualization via Plots.jl.
+The recommended backend is `gr()`
 
 ## Installation
 
-The current version has been tested with Julia 1.6 and Julia 1.9
+The current version has been tested with Julia 1.9 and up
 
 ```julia
 using Pkg
@@ -22,7 +20,7 @@ pkg"add OpenStreetMapXPlot"
 
 ## Usage
 
-We will show a full scenario including routing. Let us start by preparing the data and calculating a sample route. 
+We will show a full scenario including routing. Let us start by preparing the data and calculating a sample route.
 
 ```julia
 using OpenStreetMapX
@@ -35,33 +33,21 @@ pointB = point_to_nodes(generate_point_in_bounds(m), m)
 sr = shortest_route(m, pointA, pointB)[1]
 ```
 
-Once the map data is in the memory we can start plotting. Let us start with `Plots.jl` with a `GR` back-end (this is the recommended approach due to GR's plotting speed, however due to Julia compiling process *time-to-the-first-plot* is around one minute, while subsequent plots can be created within few seconds). 
+Once the map data is in the memory we can start plotting. Let us start with `Plots.jl` with a `GR` back-end (this is the recommended approach due to GR's plotting speed, however due to Julia compiling process *time-to-the-first-plot* is around one minute, while subsequent plots can be created within few seconds).
 
 ```julia
 using OpenStreetMapXPlot
-import Plots
+using Plots, Colors
 Plots.gr()
 p = OpenStreetMapXPlot.plotmap(m,width=600,height=400);
-addroute!(p,m,sr;route_color="red");
-plot_nodes!(p,m,[sr[1],sr[end]],start_numbering_from=nothing,fontsize=13,color="pink");
+addroute!(p,m,sr;route_color=colorant"red");
+plot_nodes!(p,m,[sr[1],sr[end]],start_numbering_from=nothing,fontsize=13,color=colorant"blue");
 p
 ```
 
 
 
 ![](plot_image.png)
-
-Now, let us paint the same route using the plain `PyPlot.jl` back-end. 
-
-```julia
-using OpenStreetMapXPlot
-import PyPlot
-p=OpenStreetMapXPlot.plotmap(m,width=600,height=400,use_plain_pyplot=true);
-addroute!(p,m,sr;route_color="red");
-plot_nodes!(p,m,[sr[1],sr[end]],start_numbering_from=nothing,fontsize=13,color="pink");
-```
-
-![](plot_image_pyplot.png)
 
 
 

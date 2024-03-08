@@ -1,16 +1,14 @@
 ###
-# Functions for Plotting Using PyPlot.jl or Plots.jl Packages
+# Functions for with Plots.jl Packages
 ###
 
 """
-	struct Style
-		color::String
+	struct Style{T}
+		color::T
 		width::Float64
 		spec::String
-		colorPyPlot::String
 	end
 
-Style of plot. Node that when using PyPlot color is provided separately.
 
 For most cases you will use constructor declared as:
 ```julia
@@ -18,21 +16,16 @@ Style(col, width, spec="-")
 ```
 
 """
-struct Style
-    color::String
+struct Style{T}
+    color::T
     width::Float64
     spec::String
-    colorPyPlot::String
 end
 
-function plotsCorToPy(col::String)::String
-    startswith(col,"0x") ? "#$(col[3:end])" : col
-end
+Style(col::T, width::Int, spec) where T= Style{T}(col, Float64(width), spec)
+Style(col::T, width) where T = Style{T}(col, Float64(width), "-")
 
-
-Style(col, width, spec="-") = Style(col, width, spec,plotsCorToPy(col))
-
-const Styles = Union{OpenStreetMapXPlot.Style,Dict{Int,OpenStreetMapXPlot.Style}}
+const Styles{T} = Union{OpenStreetMapXPlot.Style{T},Dict{Int,OpenStreetMapXPlot.Style{T}}} where T
 
 const gr_linestyles = Dict("-" => :solid, ":"=>:dot, ";"=>:dashdot, "-."=>:dashdot,"--"=>:dash)
 
@@ -58,7 +51,6 @@ Draw Ways without defined layers
 function draw_ways!(p,nodes::Dict{Int,T}, ways::Vector{OpenStreetMapX.Way},
                     style::OpenStreetMapXPlot.Styles,
                     km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
-    osm_use_pyplot = (p == :osm_use_pyplot)
     for way in ways
         X = [OpenStreetMapX.getX(nodes[node]) for node in way.nodes]
         Y = [OpenStreetMapX.getY(nodes[node]) for node in way.nodes]
@@ -67,13 +59,8 @@ function draw_ways!(p,nodes::Dict{Int,T}, ways::Vector{OpenStreetMapX.Way},
             Y /= 1000
         end
         if length(X) > 1
-            if !osm_use_pyplot
                 Plots.plot!(p, X, Y, color=style.color,width=style.width,
                                      linestyle=gr_linestyles[style.spec])
-            else
-                PyPlot.plot(X, Y, color=style.colorPyPlot,linewidth=style.width,
-                                     linestyle=style.spec)
-            end
         end
     end
 end
@@ -84,7 +71,6 @@ Draw Ways with defined Layers
 function draw_ways!(p,nodes::Dict{Int,T}, ways::Vector{OpenStreetMapX.Way},
                     class::Dict{Int,Int}, style::OpenStreetMapXPlot.Styles,
                     km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
-       osm_use_pyplot = (p == :osm_use_pyplot)
     for i = 1:length(ways)
         lineStyle = style[class[ways[i].id]]
         X = [OpenStreetMapX.getX(nodes[node]) for node in ways[i].nodes]
@@ -94,14 +80,8 @@ function draw_ways!(p,nodes::Dict{Int,T}, ways::Vector{OpenStreetMapX.Way},
             Y /= 1000
         end
         if length(X) > 1
-            if !osm_use_pyplot
-                Plots.plot!(p, X, Y, color=lineStyle.color,width=lineStyle.width,
-                                     linestyle=gr_linestyles[lineStyle.spec])
-            else
-
-                PyPlot.plot(X, Y, color=lineStyle.colorPyPlot,linewidth=lineStyle.width,
-                                     linestyle=lineStyle.spec)
-            end
+            Plots.plot!(p, X, Y, color=lineStyle.color,width=lineStyle.width,
+                            linestyle=gr_linestyles[lineStyle.spec])
         end
     end
 end
@@ -168,7 +148,6 @@ Draw Features
 function draw_features!(p,nodes::Dict{Int,T},
                         features::Dict{Int,Tuple{String,String}}, style::OpenStreetMapXPlot.Styles,
                         km::Bool) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
-    osm_use_pyplot = (p == :osm_use_pyplot)
     if isa(style, OpenStreetMapXPlot.Style)
         X = [OpenStreetMapX.getX(nodes[node]) for node in keys(features)]
         Y = [OpenStreetMapX.getY(nodes[node]) for node in keys(features)]
@@ -177,13 +156,8 @@ function draw_features!(p,nodes::Dict{Int,T},
                 Y /= 1000
         end
         if length(X) > 1
-            if !osm_use_pyplot
-                Plots.plot!(p, X, Y, color=style.color,width=style.width,
-                                             linestyle=gr_linestyles[style.spec])
-            else
-                PyPlot.plot(X, Y, color=style.colorPyPlot,linewidth=style.width,
-                                             linestyle=style.spec)
-            end
+            Plots.plot!(p, X, Y, color=style.color,width=style.width,
+                                linestyle=gr_linestyles[style.spec])
         end
     else
         classes = OpenStreetMapX.classify_features(features)
@@ -196,13 +170,8 @@ function draw_features!(p,nodes::Dict{Int,T},
                 Y /= 1000
             end
             if length(X) > 1
-                if !osm_use_pyplot
-                    Plots.plot!(p, X, Y, color=val.color,width=val.width,
-                                         linestyle=gr_linestyles[val.spec])
-                else
-                    PyPlot.plot(X, Y, color=val.colorPyPlot,linewidth=val.width,
-                                         linestyle=val.spec)
-                end
+                Plots.plot!(p, X, Y, color=val.color,width=val.width,
+                                     linestyle=gr_linestyles[val.spec])
             end
         end
     end
@@ -224,18 +193,18 @@ end
                  width::Integer=600,
                  height::Integer=600,
                  fontsize::Integer=0,
-                 km::Bool=false, 
+                 km::Bool=false,
 				 use_plain_pyplot::Bool=false
 				 ) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
 
 Plots selected map features for a given dictionary of node locations (`nodes`)
-and within the given `bounds`. 
+and within the given `bounds`.
 The `km` parameter can be used to have a kilometer scale of the map instead of meters.
 
 
-The default plotting backend is `Plots.jl`, however if the `use_plain_pyplot` 
-is set to `true` than `PyPlot.jl` is used 
-(note that due to `PyPlot`'s performance this setting should be used for maps up to few thousands nodes). 
+The default plotting backend is whatever is defined in `Plots.jl`, however if the `use_plain_pyplot`
+is set to `true` Plots.pythonplot() will be called to switch to PythonPlot backend
+(note this option is depraciated and normally backend should be changed outside of this function).
 
 
 Returns an object that can be used for further plot updates.
@@ -257,7 +226,10 @@ function plotmap(nodes::Dict{Int,T},
                  fontsize::Integer=0,
                  km::Bool=false, use_plain_pyplot::Bool=false
                  ) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
-
+    if use_plain_pyplot && !any(contains.(string(Plots.backend()), ["Python", "PyPlot"]))
+        @warn "Will now call Plots.pythonplot() to switch to PythonPlot backend"
+        Plots.pythonplot()
+    end
     # Chose labels according to point type and scale
     xlab, ylab = if isa(nodes, Dict{Int,OpenStreetMapX.LLA})
         "Longitude (deg)", "Latitude (deg)"
@@ -267,14 +239,9 @@ function plotmap(nodes::Dict{Int,T},
         "East (m)", "North (m)"
     end
 
-    p = :osm_use_pyplot  #will be overwritten if Plots.jl is used
+    local p
     if isa(bounds,Nothing)
-        if !use_plain_pyplot
-            p = Plots.plot(xlabel=xlab,ylabel=ylab,legend=false,size=(width,height))
-        else
-            PyPlot.plot(xlabel=xlab,ylabel=ylab,legend=false,size=(width,height))
-        end
-
+        p = Plots.plot(xlabel=xlab,ylabel=ylab,legend=false,size=(width,height))
     else # Limit plot to specified bounds
         if km && isa(nodes, Dict{Int,OpenStreetMapX.ENU})
             xrange = (bounds.min_x/1000, bounds.max_x/1000)
@@ -283,11 +250,7 @@ function plotmap(nodes::Dict{Int,T},
             xrange = (bounds.min_x, bounds.max_x)
             yrange = (bounds.min_y, bounds.max_y)
         end
-        if !use_plain_pyplot
-            p = Plots.plot(xlabel=xlab,ylabel=ylab,xlims=xrange,ylims=yrange,legend=false,size=(width,height))
-        else
-            PyPlot.plot(xlabel=xlab,ylabel=ylab,xlims=xrange,ylims=yrange,legend=false,size=(width,height))
-        end
+        p = Plots.plot(xlabel=xlab,ylabel=ylab,xlims=xrange,ylims=yrange,legend=false,size=(width,height))
     end
     # Draw all buildings
     if !isa(buildings,Nothing)
@@ -317,36 +280,36 @@ end
 
 """
     plotmap(m::OpenStreetMapX.MapData;
-        roadwayStyle = OpenStreetMapXPlot.LAYER_STANDARD, 
+        roadwayStyle = OpenStreetMapXPlot.LAYER_STANDARD,
         width::Integer=600, height::Integer=600, use_plain_pyplot::Bool=false)
-    
+
 Plots `roadways` for a given map `m`.
 
 The width will be set to `width` and the height will be set to `height`. If only one of `width`
 or `height` is set, the other will be set to perserve the aspect ratio of the bounding box.
 The `km` parameter can be used to have a kilometer scale of the map instead of meters.
 
-The default plotting backend is `Plots.jl`, however if the `use_plain_pyplot` 
-is set to `true` than `PyPlot.jl` is used 
-(note that due to `PyPlot`'s performance this setting should be used for maps up to few thousands nodes). 
+The default plotting backend is whatever is defined in `Plots.jl`, however if the `use_plain_pyplot`
+is set to `true` Plots.pythonplot() will be called to switch to PythonPlot backend
+(note this option is depraciated and normally backend should be changed outside of this function).
 
 Returns an object that can be used for further plot updates.
 
 """
-function plotmap(m::OpenStreetMapX.MapData;roadwayStyle = OpenStreetMapXPlot.LAYER_STANDARD, 
+function plotmap(m::OpenStreetMapX.MapData;roadwayStyle = OpenStreetMapXPlot.LAYER_STANDARD,
 	         width::Union{Integer,Nothing}=nothing, height::Union{Integer,Nothing}=nothing, km::Bool=false, use_plain_pyplot::Bool=false)
-     
+
     # Set plot aspect ratio to that of bounds (in meters), unless both height and width are specified
-    if width==nothing || height==nothing
+    if isnothing(width) || isnothing(height)
         # Compute aspect ratio
         aspect_ratio = OpenStreetMapXPlot.aspect_ratio(m.bounds)
 
-        if width==nothing && height==nothing
+        if isnothing(width) && isnothing(height)
             width = 600
             height = Int(round(width/aspect_ratio))
-        elseif height==nothing
+        elseif isnothing(height)
             height = Int(round(width/aspect_ratio))
-        elseif width==nothing
+        elseif isnothing(width)
             width = Int(round(height*aspect_ratio))
         end
     end
@@ -357,47 +320,46 @@ end
 
 """
     plotmap(m::OpenStreetMapX.Mapaddroute!(p, m::OpenStreetMapX.MapData,
-                   route::Vector{Int}; route_color::String ="0x000053",
+                   route::Vector{Int}; route_color::Union{String, Plots.RGB} ="0x000053",
                    km::Bool=false)
-                   
+
 Adds a `route` to the plot `p` representing the map `m`.
 
-The first element from the list of nodes `route` will be annoted by `start_name` 
+The first element from the list of nodes `route` will be annoted by `start_name`
 while the last will be annotated by `end_name`.
 The `km` parameter can be used to have a kilometer scale of the map instead of meters.
-    
+
 Returns an object that can be used for further plot updates.
 
 """
 
 function addroute!(p, m::OpenStreetMapX.MapData,
-                   route::Vector{Int}; route_color::String ="0x000053",
+                   route::Vector{Int}; route_color::Union{String, Plots.RGB} ="0x000053",
                    km::Bool=false, start_name="A", end_name="B", fontsize=15)
     addroute!(p, m.nodes, route, route_color=route_color, km=km, start_name=start_name, end_name=end_name, fontsize=fontsize)
 end
 
 """
     addroute!(p, nodes::Dict{Int,T},
-                   route::Vector{Int}; 
-                   route_color::String ="0x000053",
-                   km::Bool=false, 
-                   start_name="A", end_name="B", 
+                   route::Vector{Int};
+                   route_color::Union{String, Plots.RGB} ="0x000053",
+                   km::Bool=false,
+                   start_name="A", end_name="B",
                    fontsize=15
                    ) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
-                   
+
 Adds a `route` to the plot `p` using the node information stored in `nodes`.
 
-The first element from the list of nodes `route` will be annoted by `start_name` 
+The first element from the list of nodes `route` will be annoted by `start_name`
 while the last will be annotated by `end_name`.
 The `km` parameter can be used to have a kilometer scale of the map instead of meters.
-    
+
 Returns an object that can be used for further plot updates.
-                   
+
 """
 function addroute!(p, nodes::Dict{Int,T},
-                   route::Vector{Int}; route_color::String ="0x000053",
+                   route::Vector{Int}; route_color::Union{String, Plots.RGB} ="0x000053",
                    km::Bool=false, start_name="A", end_name="B", fontsize=15) where T<:Union{OpenStreetMapX.LLA,OpenStreetMapX.ENU}
-    osm_use_pyplot = (p == :osm_use_pyplot)
     route_style = OpenStreetMapXPlot.Style(route_color, 3, "--")
     X = [OpenStreetMapX.getX(nodes[node]) for node in route]
     Y = [OpenStreetMapX.getY(nodes[node]) for node in route]
@@ -407,42 +369,35 @@ function addroute!(p, nodes::Dict{Int,T},
     end
     #length(X) > 1 && Winston.plot(p, X, Y, route_style.spec, color=route_style.color, linewidth=route_style.width)
     if length(X) > 1
-        if !osm_use_pyplot
-            Plots.plot!(p, X, Y, color=route_style.color,width=route_style.width,linestyle=gr_linestyles[route_style.spec])
-            Plots.annotate!(p,X[1],Y[1],Plots.text(start_name,fontsize))
-            Plots.annotate!(p,X[end],Y[end],Plots.text(end_name,fontsize))
-        else
-            PyPlot.plot(X, Y, color=route_style.colorPyPlot,linewidth=route_style.width,linestyle=route_style.spec)
-            PyPlot.text(X[1],Y[1],start_name,fontsize=fontsize)
-            PyPlot.text(X[end],Y[end],end_name,fontsize=fontsize)
-        end
+        Plots.plot!(p, X, Y, color=route_style.color,width=route_style.width,linestyle=gr_linestyles[route_style.spec])
+        Plots.annotate!(p,X[1],Y[1],Plots.text(start_name,fontsize))
+        Plots.annotate!(p,X[end],Y[end],Plots.text(end_name,fontsize))
     end
     p
 end
 
 """
     addroute!(p, m::OpenStreetMapX.MapData,
-                   route::Vector{OpenStreetMapX.LLA}; 
-                   route_color::String ="0x000053",
-                   km::Bool=false, 
-                   start_name="A", end_name="B", 
+                   route::Vector{OpenStreetMapX.LLA};
+                   route_color::Union{String, Plots.RGB} ="0x000053",
+                   km::Bool=false,
+                   start_name="A", end_name="B",
                    fontsize=15
                    )
-                   
+
 Adds a `route` in LLA coordinates to the plot `p` representing the map `m`.
 
-The first element from the list of route coordinates `route` will be annoted by `start_name` 
+The first element from the list of route coordinates `route` will be annoted by `start_name`
 while the last will be annotated by `end_name`.
 The `km` parameter can be used to have a kilometer scale of the map instead of meters.
 
-    
+
 Returns an object that can be used for further plot updates.
-                   
+
 """
 function addroute!(p, m::OpenStreetMapX.MapData,
-                   route::Vector{OpenStreetMapX.LLA}; route_color::String ="0x000053",
+                   route::Vector{OpenStreetMapX.LLA}; route_color::Union{String, Plots.RGB} ="0x000053",
                    km::Bool=false, start_name="A", end_name="B", fontsize=15)
-    osm_use_pyplot = (p == :osm_use_pyplot)
     route_style = OpenStreetMapXPlot.Style(route_color, 3, "--")
     routeENU = [ENU(lla, m.bounds) for lla in route]
     X = map(enu->enu.east, routeENU)
@@ -452,30 +407,24 @@ function addroute!(p, m::OpenStreetMapX.MapData,
         Y /= 1000
     end
     if length(X) > 1
-        if !osm_use_pyplot
-            Plots.plot!(p, X, Y, color=route_style.color,width=route_style.width,linestyle=gr_linestyles[route_style.spec])
-            Plots.annotate!(p,X[1],Y[1],Plots.text(start_name,fontsize))
-            Plots.annotate!(p,X[end],Y[end],Plots.text(end_name,fontsize))
-        else
-            PyPlot.plot(X, Y, color=route_style.colorPyPlot,linewidth=route_style.width,linestyle=route_style.spec)
-            PyPlot.text(X[1],Y[1],start_name,fontsize=fontsize)
-            PyPlot.text(X[end],Y[end],end_name,fontsize=fontsize)
-        end
+        Plots.plot!(p, X, Y, color=route_style.color,width=route_style.width,linestyle=gr_linestyles[route_style.spec])
+        Plots.annotate!(p,X[1],Y[1],Plots.text(start_name,fontsize))
+        Plots.annotate!(p,X[end],Y[end],Plots.text(end_name,fontsize))
     end
     p
 end
 
 """
-    plot_nodes!(p, m::OpenStreetMapX.MapData, 
+    plot_nodes!(p, m::OpenStreetMapX.MapData,
         nodeids::Vector{Int};
-        start_numbering_from::Union{Int,Nothing}=1, 
-        km::Bool=false, 
-        color="darkgreen", 
-        fontsize=10) 
-    
+        start_numbering_from::Union{Int,Nothing}=1,
+        km::Bool=false,
+        color="darkgreen",
+        fontsize=10)
+
 Plots nodes having node identifiers `nodeids` on the plot `p` using map information `m`.
 By default the node indices within the are plotted (e.g. 1, 2, 3...), however,
-setting the parameter `start_numbering_from` to nothing will show actual OSM node identifiers. 
+setting the parameter `start_numbering_from` to nothing will show actual OSM node identifiers.
 The `km` parameter can be used to have a kilometer scale of the map instead of meters.
 
 Returns an object that can be used for further plot updates.
@@ -483,32 +432,27 @@ Returns an object that can be used for further plot updates.
 function plot_nodes!(p,m::OpenStreetMapX.MapData,nodeids::Vector{Int};
 		start_numbering_from ::Union{Int,Nothing}=1, km::Bool=false, color="darkgreen", fontsize=10)
     (length(nodeids) == 0) && return
-    osm_use_pyplot = (p == :osm_use_pyplot)
     divkm = (isa(m.nodes[nodeids[1]],OpenStreetMapX.ENU) && km) ? 1000.0 : 1.0
     for i in 1:length(nodeids)
         X = OpenStreetMapX.getX(m.nodes[nodeids[i]]) / divkm
         Y = OpenStreetMapX.getY(m.nodes[nodeids[i]]) / divkm
         num = string(start_numbering_from == nothing ? nodeids[i] : (i-1+start_numbering_from))
-        if !osm_use_pyplot
-            Plots.annotate!(p,X,Y,Plots.text(num,fontsize,Symbol(color)))
-        else
-            PyPlot.text(X,Y,num,color=color,fontsize=fontsize)
-        end
+        Plots.annotate!(p,X,Y,Plots.text(num,fontsize,color))
    end
    p
 end
 """
-    plot_nodes_as_symbols!(p, m::OpenStreetMapX.MapData, 
+    plot_nodes_as_symbols!(p, m::OpenStreetMapX.MapData,
         nodeids::Vector{Int};
-        symbols::Union{String,Vector{String}}="*",
-        colors::Union{String,Vector{String}}=["darkgreen"],
-        km::Bool=false, 
-        fontsize=10) 
-    
+        symbols::Union{T, Vector{T}}="*",
+        colors::Union{U,Vector{U}}=["darkgreen"],
+        km::Bool=false, fontsize=10)
+            where {T <: Union{String,Symbol}, U <: Union{String,Plots.RGB}}
+
 Plots nodes having node identifiers `nodeids` on the plot `p` using map information `m`.
 By default the nodes are plotted with the "*" symbol, however,
-setting the parameter `symbols` to a string will plot all node locations as that string. 
-Setting `symbols` to an array of strings will plot each successive location as the symbol 
+setting the parameter `symbols` to a string will plot all node locations as that string.
+Setting `symbols` to an array of strings will plot each successive location as the symbol
 in that position of the array, repeating over the string array if the `symbols` array
 is shorter than the `nodeids` array.
 The `km` parameter can be used to have a kilometer scale of the map instead of meters.
@@ -517,24 +461,19 @@ Returns an object that can be used for further plot updates.
 """
 
 function plot_nodes_as_symbols!(p,m::OpenStreetMapX.MapData,nodeids::Vector{Int};
-		                symbols::Union{String,Vector{String}}="*",
-                                colors::Union{String,Vector{String}}=["darkgreen"],
-                                km::Bool=false, fontsize=10)
+		                symbols::Union{T, Vector{T}}="*",
+                                colors::Union{U,Vector{U}}=["darkgreen"],
+                                km::Bool=false, fontsize=10) where {T <: Union{String,Symbol}, U <: Union{String,Plots.RGB}}
     (length(nodeids) == 0) && return
-    osm_use_pyplot = (p == :osm_use_pyplot)
     divkm = (isa(m.nodes[nodeids[1]],OpenStreetMapX.ENU) && km) ? 1000.0 : 1.0
-    symbols = typeof(symbols)==String ? [symbols] : symbols
-    colors = typeof(colors)==String ? [colors] : colors
+    symbols = typeof(symbols)<:AbstractVector ? symbols : [symbols]
+    colors = typeof(colors)<:AbstractVector ? colors : [colors]
     for i in 1:length(nodeids)
         X = OpenStreetMapX.getX(m.nodes[nodeids[i]]) / divkm
         Y = OpenStreetMapX.getY(m.nodes[nodeids[i]]) / divkm
         j = (i-1)%length(symbols) + 1
         k = (i-1)%length(colors) + 1
-        if !osm_use_pyplot
-            Plots.annotate!(p,X,Y,Plots.text(symbols[j],fontsize,Symbol(colors[k])))
-        else
-            PyPlot.text(X,Y,symbols[j],color=colors[k],fontsize=fontsize)
-        end
-   end
+        Plots.annotate!(p,X,Y,Plots.text(symbols[j],fontsize,colors[k]))
+    end
    p
 end
